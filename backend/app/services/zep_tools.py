@@ -440,25 +440,33 @@ class ZepToolsService:
         return self._llm_client
     
     def _call_with_retry(self, func, operation_name: str, max_retries: int = None):
-        """带重试机制的API调用"""
-        max_retries = max_retries or self.MAX_RETRIES
+        """带重试机制的API调用，自动识别 retry-after 头处理限流。"""
+        import re as _re
+        max_retries = max_retries or 6
         last_exception = None
         delay = self.RETRY_DELAY
-        
+
         for attempt in range(max_retries):
             try:
                 return func()
             except Exception as e:
                 last_exception = e
                 if attempt < max_retries - 1:
+                    err_str = str(e)
+                    # Parse Retry-After header from Zep error response
+                    retry_after = None
+                    match = _re.search(r"'retry-after':\s*'(\d+)'", err_str)
+                    if match:
+                        retry_after = int(match.group(1)) + 2
+                    wait = retry_after if retry_after else min(delay, 60)
                     logger.warning(
-                        t("console.zepRetryAttempt", operation=operation_name, attempt=attempt + 1, error=str(e)[:100], delay=f"{delay:.1f}")
+                        t("console.zepRetryAttempt", operation=operation_name, attempt=attempt + 1, error=err_str[:100], delay=f"{wait:.0f}")
                     )
-                    time.sleep(delay)
-                    delay *= 2
+                    time.sleep(wait)
+                    delay = min(delay * 2, 60)
                 else:
                     logger.error(t("console.zepAllRetriesFailed", operation=operation_name, retries=max_retries, error=str(e)))
-        
+
         raise last_exception
     
     def search_graph(
@@ -1034,36 +1042,43 @@ class ZepToolsService:
                 if target_uuid:
                     entity_uuids.add(target_uuid)
         
-        # 获取所有相关实体的详情（不限制数量，完整输出）
+        # Bulk-fetch all nodes once to avoid per-node API calls (rate-limit bottleneck)
         entity_insights = []
-        node_map = {}  # 用于后续关系链构建
-        
-        for uuid in list(entity_uuids):  # 处理所有实体，不截断
-            if not uuid:
-                continue
+        node_map = {}  # used for relationship chain building below
+
+        if entity_uuids:
             try:
-                # 单独获取每个相关节点的信息
-                node = self.get_node_detail(uuid)
+                all_graph_nodes = self.get_all_nodes(graph_id)
+                bulk_node_map = {n.uuid: n for n in all_graph_nodes}
+            except Exception as e:
+                logger.warning(f"Bulk node fetch failed, falling back to per-node: {e}")
+                bulk_node_map = {}
+
+            for uuid in list(entity_uuids):
+                if not uuid:
+                    continue
+                node = bulk_node_map.get(uuid)
+                if node is None:
+                    # Only fall back to individual fetch if not in bulk result
+                    try:
+                        node = self.get_node_detail(uuid)
+                    except Exception as e:
+                        logger.debug(f"Failed to fetch node {uuid}: {e}")
+                        continue
                 if node:
                     node_map[uuid] = node
-                    entity_type = next((l for l in node.labels if l not in ["Entity", "Node"]), "实体")
-                    
-                    # 获取该实体相关的所有事实（不截断）
+                    entity_type = next((l for l in node.labels if l not in ["Entity", "Node"]), "Entity")
                     related_facts = [
-                        f for f in all_facts 
+                        f for f in all_facts
                         if node.name.lower() in f.lower()
                     ]
-                    
                     entity_insights.append({
                         "uuid": node.uuid,
                         "name": node.name,
                         "type": entity_type,
                         "summary": node.summary,
-                        "related_facts": related_facts  # 完整输出，不截断
+                        "related_facts": related_facts,
                     })
-            except Exception as e:
-                logger.debug(f"获取节点 {uuid} 失败: {e}")
-                continue
         
         result.entity_insights = entity_insights
         result.total_entities = len(entity_insights)
@@ -1318,7 +1333,7 @@ class ZepToolsService:
         
         if not profiles:
             logger.warning(t("console.profilesNotFound", simId=simulation_id))
-            result.summary = "未找到可采访的Agent人设文件"
+            result.summary = "No agent profile files found for interview"
             return result
         
         result.total_agents = len(profiles)
@@ -1387,9 +1402,9 @@ class ZepToolsService:
             
             # 检查API调用是否成功
             if not api_result.get("success", False):
-                error_msg = api_result.get("error", "未知错误")
+                error_msg = api_result.get("error", "Unknown error")
                 logger.warning(t("console.interviewApiReturnedFailure", error=error_msg))
-                result.summary = f"采访API调用失败：{error_msg}。请检查OASIS模拟环境状态。"
+                result.summary = f"Interview API call failed: {error_msg}. Please check the OASIS simulation environment status."
                 return result
             
             # Step 5: 解析API返回结果，构建AgentInterview对象
@@ -1462,13 +1477,13 @@ class ZepToolsService:
         except ValueError as e:
             # 模拟环境未运行
             logger.warning(t("console.interviewApiCallFailed", error=e))
-            result.summary = f"采访失败：{str(e)}。模拟环境可能已关闭，请确保OASIS环境正在运行。"
+            result.summary = f"Interview failed: {str(e)}. The simulation environment may be closed; ensure the OASIS environment is running."
             return result
         except Exception as e:
             logger.error(t("console.interviewApiCallException", error=e))
             import traceback
             logger.error(traceback.format_exc())
-            result.summary = f"采访过程发生错误：{str(e)}"
+            result.summary = f"An error occurred during the interview: {str(e)}"
             return result
         
         # Step 6: 生成采访摘要

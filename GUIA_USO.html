@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiroFish — Guía de Uso Completa</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #1a1a2e;
+    background: #fff;
+    padding: 0;
+  }
+  .cover {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+    color: white;
+    padding: 80px 60px;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .cover h1 { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+  .cover .subtitle { font-size: 16px; color: #6EE7B7; margin-bottom: 24px; }
+  .cover .tagline { font-size: 13px; color: #94a3b8; max-width: 600px; }
+  .cover .badge {
+    display: inline-block; background: #6EE7B7; color: #0f0f23;
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    margin-top: 20px; text-transform: uppercase; letter-spacing: 1px;
+  }
+  .page { padding: 40px 60px; max-width: 900px; margin: 0 auto; }
+  h2 {
+    font-size: 20px; font-weight: 700; color: #0f0f23;
+    border-left: 4px solid #6EE7B7; padding-left: 12px;
+    margin: 36px 0 14px 0;
+  }
+  h3 { font-size: 15px; font-weight: 700; color: #1e3a5f; margin: 20px 0 8px 0; }
+  h4 { font-size: 13px; font-weight: 700; color: #374151; margin: 12px 0 6px 0; }
+  p { margin-bottom: 10px; color: #374151; }
+  ul, ol { padding-left: 20px; margin-bottom: 10px; }
+  li { margin-bottom: 4px; color: #374151; }
+  code {
+    background: #f1f5f9; border: 1px solid #e2e8f0;
+    padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace;
+    font-size: 12px; color: #c026d3;
+  }
+  pre {
+    background: #0f172a; color: #e2e8f0;
+    padding: 16px 20px; border-radius: 8px;
+    font-family: 'Courier New', monospace; font-size: 12px;
+    line-height: 1.7; margin: 10px 0 16px 0; overflow-x: auto;
+    border-left: 3px solid #6EE7B7;
+  }
+  pre .comment { color: #64748b; }
+  pre .cmd { color: #6EE7B7; }
+  .step-card {
+    border: 1px solid #e2e8f0; border-radius: 10px;
+    margin: 16px 0; overflow: hidden;
+  }
+  .step-header {
+    background: #f8fafc; padding: 12px 18px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .step-num {
+    background: #1e3a5f; color: white;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
+  .step-title { font-size: 14px; font-weight: 700; color: #0f0f23; }
+  .step-body { padding: 14px 18px; }
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    margin-left: 8px; vertical-align: middle;
+  }
+  .tag-llm { background: #dbeafe; color: #1d4ed8; }
+  .tag-zep { background: #d1fae5; color: #065f46; }
+  .tag-oasis { background: #ede9fe; color: #5b21b6; }
+  .tag-ui { background: #fef3c7; color: #92400e; }
+  .alert {
+    padding: 12px 16px; border-radius: 8px; margin: 12px 0;
+    border-left: 4px solid;
+  }
+  .alert-warning { background: #fffbeb; border-color: #f59e0b; color: #78350f; }
+  .alert-info    { background: #eff6ff; border-color: #3b82f6; color: #1e3a5f; }
+  .alert-danger  { background: #fef2f2; border-color: #ef4444; color: #7f1d1d; }
+  .alert-success { background: #f0fdf4; border-color: #22c55e; color: #14532d; }
+  .alert strong { font-weight: 700; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 12px 0 16px 0;
+    font-size: 12px;
+  }
+  th {
+    background: #1e3a5f; color: white;
+    padding: 8px 12px; text-align: left; font-weight: 600;
+  }
+  td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .divider {
+    border: none; border-top: 2px solid #e2e8f0;
+    margin: 30px 0;
+  }
+  .toc {
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 10px; padding: 20px 24px; margin: 20px 0;
+  }
+  .toc h3 { margin-top: 0; }
+  .toc ol { padding-left: 18px; }
+  .toc li { margin-bottom: 3px; }
+  .toc a { color: #1e3a5f; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .key-box {
+    background: #0f172a; border-radius: 8px;
+    padding: 14px 18px; margin: 10px 0;
+    font-family: 'Courier New', monospace; font-size: 11.5px;
+    color: #e2e8f0; line-height: 1.8;
+  }
+  .key-box .k { color: #6EE7B7; }
+  .key-box .v { color: #fbbf24; }
+  .key-box .comment-line { color: #64748b; }
+  .inline-icon { font-size: 15px; vertical-align: middle; margin-right: 4px; }
+  footer {
+    background: #f8fafc; border-top: 1px solid #e2e8f0;
+    padding: 20px 60px; font-size: 11px; color: #94a3b8;
+    text-align: center;
+  }
+  @media print {
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .step-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    pre { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    h2 { page-break-before: auto; }
+    .step-card { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PORTADA -->
+<div class="cover">
+  <h1>MiroFish</h1>
+  <div class="subtitle">Motor de Inteligencia Swarm y Simulación Social con IA</div>
+  <div class="tagline">
+    Guía completa de uso: instalación, pasos del flujo de trabajo, gestión de claves API,
+    reinicio del servidor y solución de errores comunes.
+  </div>
+  <div class="badge">Guía de Usuario v1.0</div>
+</div>
+
+<div class="page">
+
+<!-- TABLA DE CONTENIDOS -->
+<div class="toc">
+  <h3>Contenido</h3>
+  <ol>
+    <li><a href="#qué-es">¿Qué es MiroFish?</a></li>
+    <li><a href="#requisitos">Requisitos previos</a></li>
+    <li><a href="#correr">Cómo correr el proyecto</a></li>
+    <li><a href="#flujo">Los 5 pasos del flujo de trabajo</a></li>
+    <li><a href="#backend">Gestión del backend (cuándo y cómo reiniciar)</a></li>
+    <li><a href="#claves">Gestión de claves API (OpenAI y Zep)</a></li>
+    <li><a href="#errores">Errores comunes y soluciones</a></li>
+    <li><a href="#outputs">Qué retorna el sistema y para qué sirve</a></li>
+  </ol>
+</div>
+
+<!-- ============================== -->
+<h2 id="qué-es">1. ¿Qué es MiroFish?</h2>
+
+<p>MiroFish es un <strong>motor de simulación de opinión social basado en IA</strong>. Toma documentos reales (PDFs, textos) sobre cualquier tema, construye un grafo de conocimiento, simula cómo distintos perfiles de personas reaccionarían ante ese tema en redes sociales (Twitter/Reddit), y genera un reporte predictivo completo.</p>
+
+<h3>¿Para qué sirve?</h3>
+<ul>
+  <li><strong>Investigación de mercado:</strong> predecir cómo reaccionará el público ante el lanzamiento de un producto.</li>
+  <li><strong>Análisis de riesgo:</strong> detectar posibles controversias antes de publicar una iniciativa.</li>
+  <li><strong>Estrategia de comunicación:</strong> entender qué métricas y argumentos resuenan más.</li>
+  <li><strong>Proyectos académicos:</strong> simular dinámica de opiniones sobre temas sociales, políticos o empresariales.</li>
+  <li><strong>Business Intelligence:</strong> obtener retroalimentación simulada de usuarios antes de implementar una solución.</li>
+</ul>
+
+<h3>Arquitectura</h3>
+<table>
+  <tr><th>Componente</th><th>Tecnología</th><th>Puerto</th></tr>
+  <tr><td>Frontend (interfaz web)</td><td>Vue.js 3 + Vite</td><td>3000</td></tr>
+  <tr><td>Backend (API)</td><td>Python 3.12 + Flask</td><td>5001</td></tr>
+  <tr><td>Grafo de memoria</td><td>Zep Cloud</td><td>API externa</td></tr>
+  <tr><td>Modelo de lenguaje</td><td>OpenAI GPT-4o-mini</td><td>API externa</td></tr>
+  <tr><td>Simulación social</td><td>OASIS (camel-ai)</td><td>Interno</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- ============================== -->
+<h2 id="requisitos">2. Requisitos previos</h2>
+
+<h3>Software necesario</h3>
+<table>
+  <tr><th>Herramienta</th><th>Versión mínima</th><th>Cómo verificar</th></tr>
+  <tr><td>Node.js</td><td>18.x o superior</td><td><code>node --version</code></td></tr>
+  <tr><td>Python</td><td>3.12</td><td><code>python3 --version</code></td></tr>
+  <tr><td>uv (gestor Python)</td><td>Cualquiera</td><td><code>~/.local/bin/uv --version</code></td></tr>
+</table>
+
+<h3>Cuentas y API keys necesarias</h3>
+<table>
+  <tr><th>Servicio</th><th>URL de registro</th><th>Plan gratuito</th></tr>
+  <tr><td>OpenAI</td><td>platform.openai.com</td><td>Requiere créditos (~$5)</td></tr>
+  <tr><td>Zep Cloud</td><td>app.getzep.com</td><td>Sí (1,000 episodios/mes, 2 proyectos)</td></tr>
+</table>
+
+<div class="alert alert-warning">
+  <strong>Límite Zep gratuito:</strong> 1,000 episodios por mes y máximo 2 proyectos. Si ejecutas muchas simulaciones, puedes agotarlo. Los episodios se resetean el último día del mes. Ver sección 6 para gestión de claves.
+</div>
+
+<hr class="divider">
+
+<!-- ============================== -->
+<h2 id="correr">3. Cómo correr el proyecto</h2>
+
+<h3>Primer arranque (instalación completa)</h3>
+
+<p>Abre <strong>dos terminales</strong> apuntando a la carpeta del proyecto.</p>
+
+<h4>Terminal 1 — Backend</h4>
+<pre>
+<span class="comment"># Ir a la carpeta del backend</span>
+<span class="cmd">cd /ruta/al/proyecto/MiroFish/backend</span>
+
+<span class="comment"># Instalar dependencias (solo la primera vez)</span>
+<span class="cmd">~/.local/bin/uv sync --python 3.12</span>
+
+<span class="comment"># Iniciar el servidor</span>
+<span class="cmd">~/.local/bin/uv run python run.py</span>
+</pre>
+
+<h4>Terminal 2 — Frontend</h4>
+<pre>
+<span class="comment"># Ir a la carpeta del frontend</span>
+<span class="cmd">cd /ruta/al/proyecto/MiroFish/frontend</span>
+
+<span class="comment"># Instalar dependencias (solo la primera vez)</span>
+<span class="cmd">npm install</span>
+
+<span class="comment"># Iniciar el servidor de desarrollo</span>
+<span class="cmd">npm run dev</span>
+</pre>
+
+<p>Abre tu navegador en <strong>http://localhost:3000</strong></p>
+
+<h3>Arranques posteriores (ya instalado)</h3>
+<pre>
+<span class="comment"># Terminal 1 — Backend</span>
+<span class="cmd">cd MiroFish/backend && ~/.local/bin/uv run python run.py</span>
+
+<span class="comment"># Terminal 2 — Frontend (si no está corriendo)</span>
+<span class="cmd">cd MiroFish/frontend && npm run dev</span>
+</pre>
+
+<div class="alert alert-info">
+  <strong>Nota:</strong> El frontend (Vite) raramente necesita reiniciarse. Solo reinícialo si haces cambios en la configuración o hay un error de compilación. El backend sí requiere reinicio cuando cambias el archivo <code>.env</code>.
+</div>
+
+<hr class="divider">
+
+<!-- ============================== -->
+<h2 id="flujo">4. Los 5 pasos del flujo de trabajo</h2>
+
+<p>El flujo es lineal: cada paso depende del anterior. Usa la barra de progreso en la parte superior de la app.</p>
+
+<!-- PASO 1 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">1</div>
+    <div class="step-title">Upload &amp; Ontology Generation <span class="tag tag-llm">GPT-4o-mini</span></div>
+  </div>
+  <div class="step-body">
+    <h4>¿Qué hace?</h4>
+    <p>Sube uno o más documentos (PDF, TXT, MD) y describe el objetivo de la simulación. El sistema extrae el texto, lo analiza con GPT-4o-mini y genera una <strong>ontología</strong>: el mapa conceptual de entidades y relaciones relevantes para el tema.</p>
+
+    <h4>Qué ingresas</h4>
+    <ul>
+      <li>Archivo(s) con información del tema (informes, artículos, documentos de negocio)</li>
+      <li>Descripción del objetivo: <em>"Quiero predecir la reacción del público ante el lanzamiento de esta app"</em></li>
+    </ul>
+
+    <h4>Qué retorna</h4>
+    <ul>
+      <li>Lista de <strong>tipos de entidades</strong> (Ej: Usuario, Empresa, Producto)</li>
+      <li>Lista de <strong>tipos de relaciones</strong> (Ej: USA, TRABAJA_EN, OPINA_SOBRE)</li>
+      <li>Resumen del análisis del documento</li>
+    </ul>
+
+    <h4>Duración aproximada</h4>
+    <p>30–90 segundos (depende del tamaño del documento).</p>
+
+    <div class="alert alert-info">
+      Puedes editar manualmente la ontología generada antes de continuar al paso 2.
+    </div>
+  </div>
+</div>
+
+<!-- PASO 2 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">2</div>
+    <div class="step-title">Build Knowledge Graph <span class="tag tag-zep">Zep Cloud</span></div>
+  </div>
+  <div class="step-body">
+    <h4>¿Qué hace?</h4>
+    <p>Toma el texto del documento, lo divide en fragmentos (chunks) y los sube a <strong>Zep Cloud</strong> como "episodios de memoria". Zep procesa el texto, identifica entidades y relaciones según la ontología, y construye un <strong>grafo de conocimiento</strong> estructurado.</p>
+
+    <h4>Qué retorna</h4>
+    <ul>
+      <li>Grafo visual con nodos (entidades) y aristas (relaciones)</li>
+      <li>Número de nodos y aristas creados</li>
+      <li>El grafo queda guardado en Zep Cloud para los pasos siguientes</li>
+    </ul>
+
+    <h4>Duración aproximada</h4>
+    <p>2–10 minutos (Zep necesita tiempo para procesar los episodios en su infraestructura).</p>
+
+    <div class="alert alert-warning">
+      <strong>Este paso consume tu cuota de episodios Zep.</strong> El plan gratuito tiene 1,000 episodios/mes. Un documento típico usa 30–80 episodios. Si falla con error 403, ver sección 6.
+    </div>
+  </div>
+</div>
+
+<!-- PASO 3 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">3</div>
+    <div class="step-title">Generate Simulation Config <span class="tag tag-llm">GPT-4o-mini</span> <span class="tag tag-zep">Zep</span></div>
+  </div>
+  <div class="step-body">
+    <h4>¿Qué hace?</h4>
+    <p>Lee el grafo de conocimiento y genera la configuración para la simulación OASIS. Esto incluye crear <strong>perfiles de agentes simulados</strong> (personas ficticias con biografías, profesiones, opiniones) que representan diferentes segmentos de la población.</p>
+
+    <h4>Qué retorna</h4>
+    <ul>
+      <li>Archivos de configuración para Twitter simulado y Reddit simulado</li>
+      <li>Perfiles de 20–100 agentes (personas ficticias con nombre, edad, profesión, bio, opiniones)</li>
+      <li>Tópico inicial de discusión</li>
+    </ul>
+
+    <h4>Duración aproximada</h4>
+    <p>3–8 minutos.</p>
+
+    <div class="alert alert-info">
+      Si este paso se queda "generando" por más de 15 minutos sin avanzar, revisa los logs del backend. Puede ser un problema de rate limit con Zep.
+    </div>
+  </div>
+</div>
+
+<!-- PASO 4 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">4</div>
+    <div class="step-title">Run Simulation <span class="tag tag-oasis">OASIS</span> <span class="tag tag-llm">GPT-4o-mini</span></div>
+  </div>
+  <div class="step-body">
+    <h4>¿Qué hace?</h4>
+    <p>Inicia el motor OASIS (Open Agent Social Interaction Simulation). Cada agente creado en el paso 3 empieza a publicar, comentar y reaccionar como si fuera una red social real. El sistema simula N rondas de interacción.</p>
+
+    <h4>Qué retorna</h4>
+    <ul>
+      <li>Feed de publicaciones simuladas (estilo Twitter/Reddit)</li>
+      <li>Estadísticas de interacción (likes, comentarios, shares)</li>
+      <li>Estado emocional y evolución de opinión de cada agente</li>
+      <li>Los resultados se guardan en el grafo Zep como nueva memoria</li>
+    </ul>
+
+    <h4>Duración aproximada</h4>
+    <p>5–20 minutos (depende del número de rondas configuradas).</p>
+
+    <div class="alert alert-warning">
+      <strong>Consume tokens de OpenAI.</strong> Cada agente por cada ronda hace una llamada LLM. 50 agentes × 10 rondas = ~500 llamadas LLM.
+    </div>
+  </div>
+</div>
+
+<!-- PASO 5 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">5</div>
+    <div class="step-title">Generate Report <span class="tag tag-llm">GPT-4o-mini</span> <span class="tag tag-zep">Zep</span></div>
+  </div>
+  <div class="step-body">
+    <h4>¿Qué hace?</h4>
+    <p>Un agente de IA lee el grafo de conocimiento + los resultados de la simulación y produce un <strong>reporte analítico estructurado</strong> en múltiples secciones. Usa herramientas de búsqueda semántica sobre el grafo para extraer insights.</p>
+
+    <h4>Qué retorna</h4>
+    <ul>
+      <li>Reporte en formato Markdown con 4 secciones temáticas</li>
+      <li>Métricas clave, análisis de sentimiento, recomendaciones</li>
+      <li>Botón de <strong>descarga del reporte (.md)</strong> al finalizar</li>
+      <li>El archivo se guarda en <code>backend/uploads/reports/</code></li>
+    </ul>
+
+    <h4>Duración aproximada</h4>
+    <p>10–40 minutos (el agente hace múltiples búsquedas en Zep).</p>
+
+    <div class="alert alert-success">
+      Al terminar aparece el botón <strong>"Download Report (.md)"</strong>. Puedes abrir ese archivo en VS Code, Notion, Obsidian o cualquier lector Markdown para leer y compartir el reporte.
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ============================== -->
+<h2 id="backend">5. Gestión del backend</h2>
+
+<h3>¿Cuándo reiniciar el backend?</h3>
+<table>
+  <tr><th>Situación</th><th>¿Reiniciar?</th></tr>
+  <tr><td>Cambiaste una clave en el archivo <code>.env</code></td><td>✅ Sí, siempre</td></tr>
+  <tr><td>Modificaste un archivo <code>.py</code> del backend</td><td>✅ Sí (Flask lo hace automáticamente en modo debug)</td></tr>
+  <tr><td>El proceso crasheó o no responde</td><td>✅ Sí</td></tr>
+  <tr><td>Cambiaste archivos del frontend (<code>.vue</code>, <code>.js</code>)</td><td>❌ No (Vite recarga solo)</td></tr>
+  <tr><td>Cambiaste archivos de traducción (<code>locales/*.json</code>)</td><td>❌ No (Vite recarga solo)</td></tr>
+</table>
+
+<div class="alert alert-danger">
+  <strong>Importante:</strong> Si el backend se reinicia mientras hay un reporte o simulación en progreso, esa tarea se cancela. Tendrás que volver a iniciarla desde la app.
+</div>
+
+<h3>Cómo reiniciar el backend</h3>
+
+<h4>Opción A — Terminar el proceso actual y volver a correrlo</h4>
+<pre>
+<span class="comment"># En una terminal nueva, matar el proceso en el puerto 5001</span>
+<span class="cmd">lsof -ti:5001 | xargs kill -9</span>
+
+<span class="comment"># Reiniciar</span>
+<span class="cmd">cd MiroFish/backend</span>
+<span class="cmd">~/.local/bin/uv run python run.py</span>
+</pre>
+
+<h4>Opción B — En la terminal donde está corriendo</h4>
+<pre>
+<span class="comment"># Presiona Ctrl+C para detenerlo, luego:</span>
+<span class="cmd">~/.local/bin/uv run python run.py</span>
+</pre>
+
+<h3>Verificar que el backend está corriendo</h3>
+<pre>
+<span class="cmd">curl http://localhost:5001/health</span>
+<span class="comment"># Respuesta esperada: {"service": "MiroFish Backend", "status": "ok"}</span>
+</pre>
+
+<p>O simplemente abre <strong>http://localhost:5001/health</strong> en tu navegador.</p>
+
+<hr class="divider">
+
+<!-- ============================== -->
+<h2 id="claves">6. Gestión de claves API</h2>
+
+<h3>¿Dónde están las claves?</h3>
+<p>Todas las claves están en el archivo <code>MiroFish/.env</code> en la raíz del proyecto.</p>
+
+<div class="key-box">
+<span class="comment-line"># Clave OpenAI — para todas las llamadas LLM</span><br>
+<span class="k">LLM_API_KEY</span>=<span class="v">sk-proj-XXXXXXXXXXXXXXXX</span><br>
+<span class="k">LLM_BASE_URL</span>=<span class="v">https://api.openai.com/v1</span><br>
+<span class="k">LLM_MODEL_NAME</span>=<span class="v">gpt-4o-mini</span><br>
+<br>
+<span class="comment-line"># Clave Zep Cloud — para el grafo de memoria</span><br>
+<span class="k">ZEP_API_KEY</span>=<span class="v">z_1dWlk...XXXXXXXXXXXXXXXX</span>
+</div>
+
+<h3>Cómo actualizar una clave</h3>
+<ol>
+  <li>Abre el archivo <code>.env</code> con cualquier editor de texto</li>
+  <li>Reemplaza el valor de la clave (solo el valor, no el nombre)</li>
+  <li>Guarda el archivo</li>
+  <li><strong>Reinicia el backend</strong> (ver sección 5)</li>
+</ol>
+
+<h3>Cómo probar si las claves funcionan</h3>
+
+<h4>Probar clave OpenAI</h4>
+<pre>
+<span class="cmd">cd MiroFish/backend</span>
+<span class="cmd">~/.local/bin/uv run python -c "
+from app.utils.llm_client import LLMClient
+client = LLMClient()
+result = client.chat([{'role': 'user', 'content': 'Say hi'}], max_tokens=5)
+print('OK:', result)
+"</span>
+<span class="comment"># Si sale "OK: Hi" → la clave funciona</span>
+<span class="comment"># Si sale "AuthenticationError" → la clave es inválida</span>
+</pre>
+
+<h4>Probar clave Zep</h4>
+<pre>
+<span class="cmd">~/.local/bin/uv run python -c "
+import uuid, os
+from dotenv import load_dotenv; load_dotenv('../.env')
+from zep_cloud.client import Zep
+client = Zep(api_key=os.getenv('ZEP_API_KEY'))
+g = client.graph.create(graph_id=str(uuid.uuid4()), name='test')
+print('OK - Zep funciona, cuota disponible')
+"</span>
+<span class="comment"># "OK" → funciona y hay cuota</span>
+<span class="comment"># "401 unauthorized" → clave inválida</span>
+<span class="comment"># "403 episode usage limit" → cuota agotada</span>
+</pre>
+
+<h3>Dónde obtener nuevas claves</h3>
+<table>
+  <tr><th>Clave</th><th>URL</th><th>Pasos</th></tr>
+  <tr>
+    <td>OpenAI</td>
+    <td>platform.openai.com/api-keys</td>
+    <td>Login → API Keys → Create new secret key</td>
+  </tr>
+  <tr>
+    <td>Zep Cloud</td>
+    <td>app.getzep.com</td>
+    <td>Login → Tu proyecto → Settings → API Keys → Generate</td>
+  </tr>
+</table>
+
+<h3>Límites del plan gratuito de Zep</h3>
+<table>
+  <tr><th>Límite</th><th>Cantidad</th><th>Se resetea</th></tr>
+  <tr><td>Episodios (memoria)</td><td>1,000 / mes</td><td>Último día del mes</td></tr>
+  <tr><td>Proyectos</td><td>2</td><td>No se resetea (límite fijo)</td></tr>
+  <tr><td>Requests por minuto</td><td>5 req/min</td><td>Cada minuto</td></tr>
+</table>
+
+<h3>¿Qué hacer cuando se agota la cuota Zep?</h3>
+<ol>
+  <li><strong>Opción A — Esperar el reset mensual</strong> (gratis, automático)</li>
+  <li><strong>Opción B — Borrar grafos viejos</strong>: ve a app.getzep.com → tu proyecto → elimina grafos de simulaciones anteriores</li>
+  <li><strong>Opción C — Nueva cuenta con otro email</strong>: registra <code>tuemail+2@gmail.com</code> en app.getzep.com (funciona como email diferente)</li>
+  <li><strong>Opción D — Upgrade a plan pagado</strong>: app.getzep.com/billing</li>
+</ol>
+
+<hr class="divider">
+
+<!-- ============================== -->
+<h2 id="errores">7. Errores comunes y soluciones</h2>
+
+<table>
+  <tr><th>Error</th><th>Causa</th><th>Solución</th></tr>
+  <tr>
+    <td><code>401 unauthorized</code> (Zep)</td>
+    <td>La API key de Zep es inválida o fue regenerada</td>
+    <td>Genera nueva key en app.getzep.com y actualiza el <code>.env</code></td>
+  </tr>
+  <tr>
+    <td><code>403 episode usage limit</code> (Zep)</td>
+    <td>Agotaste los 1,000 episodios del plan gratis</td>
+    <td>Borra grafos viejos, espera el reset mensual, o crea nueva cuenta</td>
+  </tr>
+  <tr>
+    <td><code>429 rate limit</code> (Zep)</td>
+    <td>Más de 5 llamadas/minuto al API de Zep</td>
+    <td>El sistema reintenta automáticamente. Solo espera.</td>
+  </tr>
+  <tr>
+    <td><code>401 AuthenticationError</code> (OpenAI)</td>
+    <td>La API key de OpenAI es inválida o expiró</td>
+    <td>Genera nueva key en platform.openai.com/api-keys</td>
+  </tr>
+  <tr>
+    <td><code>429 RateLimitError</code> (OpenAI)</td>
+    <td>Excediste tokens por minuto (200k TPM en plan free)</td>
+    <td>El sistema reintenta automáticamente con backoff exponencial</td>
+  </tr>
+  <tr>
+    <td><code>500 Internal Server Error</code></td>
+    <td>Error genérico del backend</td>
+    <td>Revisa los logs del backend en la terminal para ver el error exacto</td>
+  </tr>
+  <tr>
+    <td>Frontend no carga</td>
+    <td>El servidor de Vite no está corriendo</td>
+    <td>Corre <code>npm run dev</code> en la carpeta <code>frontend/</code></td>
+  </tr>
+  <tr>
+    <td>Paso se queda "generando" para siempre</td>
+    <td>El backend crasheó o hay un error silencioso</td>
+    <td>Revisa los logs del backend; reinicia si es necesario</td>
+  </tr>
+  <tr>
+    <td>"Interview failed" en el reporte</td>
+    <td>La simulación OASIS no está activa en ese momento</td>
+    <td>Normal — el reporte continúa con otras herramientas</td>
+  </tr>
+  <tr>
+    <td>Reporte en idioma incorrecto</td>
+    <td>El idioma por defecto era chino en versiones antiguas</td>
+    <td>El idioma por defecto ya es inglés. Inicia un nuevo reporte.</td>
+  </tr>
+</table>
+
+<h3>Ver logs del backend en tiempo real</h3>
+<pre>
+<span class="comment"># En la terminal donde corre el backend verás los logs directamente.</span>
+<span class="comment"># Si lo iniciaste en background, puedes ver los logs con:</span>
+<span class="cmd">tail -f /tmp/mirofish_backend.log</span>
+</pre>
+
+<hr class="divider">
+
+<!-- ============================== -->
+<h2 id="outputs">8. Qué retorna el sistema y para qué sirve</h2>
+
+<h3>Archivos generados</h3>
+<table>
+  <tr><th>Archivo</th><th>Ubicación</th><th>Contenido</th></tr>
+  <tr>
+    <td><code>full_report.md</code></td>
+    <td><code>backend/uploads/reports/report_XXXX/</code></td>
+    <td>Reporte analítico completo en Markdown</td>
+  </tr>
+  <tr>
+    <td><code>section_01.md … section_04.md</code></td>
+    <td><code>backend/uploads/reports/report_XXXX/</code></td>
+    <td>Cada sección del reporte por separado</td>
+  </tr>
+  <tr>
+    <td><code>meta.json</code></td>
+    <td><code>backend/uploads/reports/report_XXXX/</code></td>
+    <td>Metadatos del reporte (estado, timestamps, simulación asociada)</td>
+  </tr>
+  <tr>
+    <td><code>agent_log.jsonl</code></td>
+    <td><code>backend/uploads/reports/report_XXXX/</code></td>
+    <td>Log detallado de cada decisión del agente IA durante la generación</td>
+  </tr>
+  <tr>
+    <td><code>project.json</code></td>
+    <td><code>backend/uploads/projects/proj_XXXX/</code></td>
+    <td>Configuración del proyecto (ontología, grafo ID, parámetros)</td>
+  </tr>
+</table>
+
+<h3>Cómo abrir y compartir el reporte</h3>
+<ul>
+  <li><strong>VS Code:</strong> abre el <code>.md</code> y presiona Ctrl+Shift+V para preview</li>
+  <li><strong>Notion:</strong> importa el archivo Markdown directamente</li>
+  <li><strong>Obsidian:</strong> copia el archivo a tu vault</li>
+  <li><strong>GitHub:</strong> sube el archivo — se renderiza automáticamente</li>
+  <li><strong>PDF:</strong> abre en VS Code con la extensión Markdown PDF, o en un editor online como dillinger.io</li>
+</ul>
+
+<h3>Resumen del flujo completo</h3>
+<pre>
+Documentos (PDF/TXT)
+       │
+       ▼
+[Paso 1] Ontología → mapa conceptual del tema
+       │
+       ▼
+[Paso 2] Grafo Zep → conocimiento estructurado
+       │
+       ▼
+[Paso 3] Perfiles de agentes → personas simuladas
+       │
+       ▼
+[Paso 4] Simulación OASIS → reacciones sociales simuladas
+       │
+       ▼
+[Paso 5] Reporte → análisis + predicciones + métricas
+       │
+       ▼
+  full_report.md  ←  Descargar desde la app
+</pre>
+
+</div><!-- /page -->
+
+<footer>
+  MiroFish — Guía de Usuario &nbsp;|&nbsp; Generado para uso interno &nbsp;|&nbsp; 2026
+</footer>
+
+</body>
+</html>

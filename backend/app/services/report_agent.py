@@ -192,7 +192,8 @@ class ReportLogger:
         section_index: int,
         tool_name: str,
         result: str,
-        iteration: int
+        iteration: int,
+        facts_count: int = 0
     ):
         """记录工具调用结果（完整内容，不截断）"""
         self.log(
@@ -203,8 +204,9 @@ class ReportLogger:
             details={
                 "iteration": iteration,
                 "tool_name": tool_name,
-                "result": result,  # 完整结果，不截断
+                "result": result,
                 "result_length": len(result),
+                "facts_count": facts_count,
                 "message": t('report.toolResult', toolName=tool_name)
             }
         )
@@ -953,20 +955,15 @@ class ReportAgent:
             }
         }
     
-    def _execute_tool(self, tool_name: str, parameters: Dict[str, Any], report_context: str = "") -> str:
+    def _execute_tool(self, tool_name: str, parameters: Dict[str, Any], report_context: str = "") -> tuple:
         """
-        执行工具调用
-        
-        Args:
-            tool_name: 工具名称
-            parameters: 工具参数
-            report_context: 报告上下文（用于InsightForge）
-            
+        Execute a tool call.
+
         Returns:
-            工具执行结果（文本格式）
+            (result_text: str, facts_count: int)
         """
         logger.info(t('report.executingTool', toolName=tool_name, params=parameters))
-        
+
         try:
             if tool_name == "insight_forge":
                 query = parameters.get("query", "")
@@ -977,10 +974,9 @@ class ReportAgent:
                     simulation_requirement=self.simulation_requirement,
                     report_context=ctx
                 )
-                return result.to_text()
-            
+                return result.to_text(), result.total_facts
+
             elif tool_name == "panorama_search":
-                # 广度搜索 - 获取全貌
                 query = parameters.get("query", "")
                 include_expired = parameters.get("include_expired", True)
                 if isinstance(include_expired, str):
@@ -990,10 +986,9 @@ class ReportAgent:
                     query=query,
                     include_expired=include_expired
                 )
-                return result.to_text()
-            
+                return result.to_text(), result.active_count + result.historical_count
+
             elif tool_name == "quick_search":
-                # 简单搜索 - 快速检索
                 query = parameters.get("query", "")
                 limit = parameters.get("limit", 10)
                 if isinstance(limit, str):
@@ -1003,10 +998,9 @@ class ReportAgent:
                     query=query,
                     limit=limit
                 )
-                return result.to_text()
-            
+                return result.to_text(), result.total_count
+
             elif tool_name == "interview_agents":
-                # 深度采访 - 调用真实的OASIS采访API获取模拟Agent的回答（双平台）
                 interview_topic = parameters.get("interview_topic", parameters.get("query", ""))
                 max_agents = parameters.get("max_agents", 5)
                 if isinstance(max_agents, str):
@@ -1018,29 +1012,27 @@ class ReportAgent:
                     simulation_requirement=self.simulation_requirement,
                     max_agents=max_agents
                 )
-                return result.to_text()
-            
+                return result.to_text(), result.interviewed_count
+
             # ========== 向后兼容的旧工具（内部重定向到新工具） ==========
-            
+
             elif tool_name == "search_graph":
-                # 重定向到 quick_search
                 logger.info(t('report.redirectToQuickSearch'))
                 return self._execute_tool("quick_search", parameters, report_context)
-            
+
             elif tool_name == "get_graph_statistics":
                 result = self.zep_tools.get_graph_statistics(self.graph_id)
-                return json.dumps(result, ensure_ascii=False, indent=2)
-            
+                return json.dumps(result, ensure_ascii=False, indent=2), 0
+
             elif tool_name == "get_entity_summary":
                 entity_name = parameters.get("entity_name", "")
                 result = self.zep_tools.get_entity_summary(
                     graph_id=self.graph_id,
                     entity_name=entity_name
                 )
-                return json.dumps(result, ensure_ascii=False, indent=2)
-            
+                return json.dumps(result, ensure_ascii=False, indent=2), 0
+
             elif tool_name == "get_simulation_context":
-                # 重定向到 insight_forge，因为它更强大
                 logger.info(t('report.redirectToInsightForge'))
                 query = parameters.get("query", self.simulation_requirement)
                 return self._execute_tool("insight_forge", {"query": query}, report_context)
@@ -1052,14 +1044,14 @@ class ReportAgent:
                     entity_type=entity_type
                 )
                 result = [n.to_dict() for n in nodes]
-                return json.dumps(result, ensure_ascii=False, indent=2)
-            
+                return json.dumps(result, ensure_ascii=False, indent=2), len(nodes)
+
             else:
-                return f"未知工具: {tool_name}。请使用以下工具之一: insight_forge, panorama_search, quick_search"
-                
+                return f"未知工具: {tool_name}。请使用以下工具之一: insight_forge, panorama_search, quick_search", 0
+
         except Exception as e:
             logger.error(t('report.toolExecFailed', toolName=tool_name, error=str(e)))
-            return f"工具执行失败: {str(e)}"
+            return f"工具执行失败: {str(e)}", 0
     
     # 合法的工具名称集合，用于裸 JSON 兜底解析时校验
     VALID_TOOL_NAMES = {"insight_forge", "panorama_search", "quick_search", "interview_agents"}
@@ -1319,7 +1311,7 @@ class ReportAgent:
                 # 最后一次迭代也返回 None，跳出循环进入强制收尾
                 break
 
-            logger.debug(f"LLM响应: {response[:200]}...")
+            logger.debug(f"LLM response: {response[:200]}...")
 
             # 解析一次，复用结果
             tool_calls = self._parse_tool_calls(response)
@@ -1429,7 +1421,7 @@ class ReportAgent:
                         iteration=iteration + 1
                     )
 
-                result = self._execute_tool(
+                result, facts_count = self._execute_tool(
                     call["name"],
                     call.get("parameters", {}),
                     report_context=report_context
@@ -1441,7 +1433,8 @@ class ReportAgent:
                         section_index=section_index,
                         tool_name=call["name"],
                         result=result,
-                        iteration=iteration + 1
+                        iteration=iteration + 1,
+                        facts_count=facts_count
                     )
 
                 tool_calls_count += 1
@@ -1849,7 +1842,7 @@ class ReportAgent:
             for call in tool_calls[:1]:  # 每轮最多执行1次工具调用
                 if len(tool_calls_made) >= self.MAX_TOOL_CALLS_PER_CHAT:
                     break
-                result = self._execute_tool(call["name"], call.get("parameters", {}))
+                result, _fc = self._execute_tool(call["name"], call.get("parameters", {}))
                 tool_results.append({
                     "tool": call["name"],
                     "result": result[:1500]  # 限制结果长度

@@ -128,13 +128,25 @@
           </div>
 
           <!-- Next Step Button - 在完成后显示 -->
-          <button v-if="isComplete" class="next-step-btn" @click="goToInteraction">
-            <span>{{ $t('step4.goToInteraction') }}</span>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </button>
+          <div v-if="isComplete" class="complete-actions">
+            <button class="download-btn" @click="openPdfReport">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span>{{ $t('step4.downloadReportPdf') }}</span>
+            </button>
+            <button class="next-step-btn" @click="goToInteraction">
+              <span>{{ $t('step4.goToInteraction') }}</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
 
           <div class="workflow-divider"></div>
         </div>
@@ -396,7 +408,7 @@ import { useI18n } from 'vue-i18n'
 import { getAgentLog, getConsoleLog } from '../api/report'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const props = defineProps({
   reportId: String,
@@ -410,6 +422,12 @@ const emit = defineEmits(['add-log', 'update-status'])
 const goToInteraction = () => {
   if (props.reportId) {
     router.push({ name: 'Interaction', params: { reportId: props.reportId } })
+  }
+}
+
+const openPdfReport = () => {
+  if (props.reportId) {
+    window.open(`/api/report/${props.reportId}/download/pdf?locale=${locale.value}`, '_blank')
   }
 }
 
@@ -3402,13 +3420,43 @@ watch(() => props.reportId, (newId) => {
   font-size: 14px;
 }
 
-.next-step-btn {
+.complete-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.download-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   width: calc(100% - 40px);
   margin: 4px 20px 0 20px;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6EE7B7;
+  background: transparent;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.download-btn:hover {
+  background: #111827;
+  border-color: #6EE7B7;
+}
+
+.next-step-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: calc(100% - 40px);
+  margin: 0 20px 0 20px;
   padding: 14px 20px;
   font-size: 14px;
   font-weight: 600;

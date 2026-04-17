@@ -86,42 +86,51 @@ class ZepEntityReader:
         self.client = Zep(api_key=self.api_key)
     
     def _call_with_retry(
-        self, 
-        func: Callable[[], T], 
+        self,
+        func: Callable[[], T],
         operation_name: str,
-        max_retries: int = 3,
+        max_retries: int = 6,
         initial_delay: float = 2.0
     ) -> T:
         """
-        带重试机制的Zep API调用
-        
+        带重试机制的Zep API调用，自动识别 retry-after 头以处理限流。
+
         Args:
             func: 要执行的函数（无参数的lambda或callable）
             operation_name: 操作名称，用于日志
-            max_retries: 最大重试次数（默认3次，即最多尝试3次）
+            max_retries: 最大重试次数（默认6次）
             initial_delay: 初始延迟秒数
-            
+
         Returns:
             API调用结果
         """
+        import re as _re
+
         last_exception = None
         delay = initial_delay
-        
+
         for attempt in range(max_retries):
             try:
                 return func()
             except Exception as e:
                 last_exception = e
                 if attempt < max_retries - 1:
+                    # Try to read the Retry-After value from the exception
+                    err_str = str(e)
+                    retry_after = None
+                    match = _re.search(r"'retry-after':\s*'(\d+)'", err_str)
+                    if match:
+                        retry_after = int(match.group(1)) + 2  # add 2s buffer
+                    wait = retry_after if retry_after else delay
                     logger.warning(
-                        f"Zep {operation_name} 第 {attempt + 1} 次尝试失败: {str(e)[:100]}, "
-                        f"{delay:.1f}秒后重试..."
+                        f"Zep {operation_name} Attempt {attempt + 1} failed: {err_str[:100]}, "
+                        f"retrying in {wait:.0f}s..."
                     )
-                    time.sleep(delay)
-                    delay *= 2  # 指数退避
+                    time.sleep(wait)
+                    delay = min(delay * 2, 60)  # cap at 60s
                 else:
-                    logger.error(f"Zep {operation_name} 在 {max_retries} 次尝试后仍失败: {str(e)}")
-        
+                    logger.error(f"Zep {operation_name} still failed after {max_retries} attempts: {str(e)}")
+
         raise last_exception
     
     def get_all_nodes(self, graph_id: str) -> List[Dict[str, Any]]:
@@ -134,7 +143,7 @@ class ZepEntityReader:
         Returns:
             节点列表
         """
-        logger.info(f"获取图谱 {graph_id} 的所有节点...")
+        logger.info(f"Fetching all nodes for graph {graph_id}...")
 
         nodes = fetch_all_nodes(self.client, graph_id)
 
@@ -148,7 +157,7 @@ class ZepEntityReader:
                 "attributes": node.attributes or {},
             })
 
-        logger.info(f"共获取 {len(nodes_data)} 个节点")
+        logger.info(f"Fetched {len(nodes_data)} nodes total")
         return nodes_data
 
     def get_all_edges(self, graph_id: str) -> List[Dict[str, Any]]:
@@ -161,7 +170,7 @@ class ZepEntityReader:
         Returns:
             边列表
         """
-        logger.info(f"获取图谱 {graph_id} 的所有边...")
+        logger.info(f"Fetching all edges for graph {graph_id}...")
 
         edges = fetch_all_edges(self.client, graph_id)
 
@@ -176,7 +185,7 @@ class ZepEntityReader:
                 "attributes": edge.attributes or {},
             })
 
-        logger.info(f"共获取 {len(edges_data)} 条边")
+        logger.info(f"Fetched {len(edges_data)} edges total")
         return edges_data
     
     def get_node_edges(self, node_uuid: str) -> List[Dict[str, Any]]:
@@ -209,7 +218,7 @@ class ZepEntityReader:
             
             return edges_data
         except Exception as e:
-            logger.warning(f"获取节点 {node_uuid} 的边失败: {str(e)}")
+            logger.warning(f"Failed to fetch edges for node {node_uuid}: {str(e)}")
             return []
     
     def filter_defined_entities(
@@ -233,7 +242,7 @@ class ZepEntityReader:
         Returns:
             FilteredEntities: 过滤后的实体集合
         """
-        logger.info(f"开始筛选图谱 {graph_id} 的实体...")
+        logger.info(f"Filtering entities for graph {graph_id}...")
         
         # 获取所有节点
         all_nodes = self.get_all_nodes(graph_id)
@@ -248,26 +257,41 @@ class ZepEntityReader:
         # 筛选符合条件的实体
         filtered_entities = []
         entity_types_found = set()
-        
+
+        # First pass: try strict filter (only nodes with custom ontology labels)
+        strict_candidates = []
         for node in all_nodes:
             labels = node.get("labels", [])
-            
-            # 筛选逻辑：Labels必须包含除"Entity"和"Node"之外的标签
             custom_labels = [l for l in labels if l not in ["Entity", "Node"]]
-            
-            if not custom_labels:
-                # 只有默认标签，跳过
-                continue
-            
+            if custom_labels:
+                strict_candidates.append((node, custom_labels))
+
+        # If Zep hasn't classified any node with custom labels yet, fall back to
+        # accepting all nodes (labelled only as "Entity") so the simulation can
+        # still proceed.  Each node gets the synthetic label "Person" so the
+        # rest of the pipeline works correctly.
+        use_fallback = len(strict_candidates) == 0
+        if use_fallback:
+            logger.warning(
+                "No nodes with custom labels found; Zep has not yet completed ontology classification. "
+                "Falling back to all nodes (labelled as Person) to continue simulation."
+            )
+            candidates = [(node, ["Person"]) for node in all_nodes if node.get("name")]
+        else:
+            candidates = strict_candidates
+
+        for node, custom_labels in candidates:
+            labels = node.get("labels", [])
+
             # 如果指定了预定义类型，检查是否匹配
-            if defined_entity_types:
+            if defined_entity_types and not use_fallback:
                 matching_labels = [l for l in custom_labels if l in defined_entity_types]
                 if not matching_labels:
                     continue
                 entity_type = matching_labels[0]
             else:
                 entity_type = custom_labels[0]
-            
+
             entity_types_found.add(entity_type)
             
             # 创建实体节点对象
@@ -320,8 +344,8 @@ class ZepEntityReader:
             
             filtered_entities.append(entity)
         
-        logger.info(f"筛选完成: 总节点 {total_count}, 符合条件 {len(filtered_entities)}, "
-                   f"实体类型: {entity_types_found}")
+        logger.info(f"Filter complete: total nodes {total_count}, matched {len(filtered_entities)}, "
+                   f"entity types: {entity_types_found}")
         
         return FilteredEntities(
             entities=filtered_entities,
@@ -407,7 +431,7 @@ class ZepEntityReader:
             )
             
         except Exception as e:
-            logger.error(f"获取实体 {entity_uuid} 失败: {str(e)}")
+            logger.error(f"Failed to fetch entity {entity_uuid}: {str(e)}")
             return None
     
     def get_entities_by_type(

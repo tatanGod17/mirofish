@@ -441,6 +441,42 @@ def download_report(report_id: str):
         }), 500
 
 
+@report_bp.route('/<report_id>/download/pdf', methods=['GET'])
+def download_report_pdf(report_id: str):
+    """
+    Generate and return a corporate HTML report for browser print-to-PDF.
+
+    Returns HTML (Content-Type: text/html) that the frontend opens in a new
+    tab. The user then uses Ctrl/Cmd+P → Save as PDF.
+    """
+    try:
+        from flask import make_response
+        from ..services.pdf_generator import generate_pdf_report
+
+        report = ReportManager.get_report(report_id)
+        if not report:
+            return jsonify({
+                "success": False,
+                "error": t('api.reportNotFound', id=report_id)
+            }), 404
+
+        report_folder = ReportManager._get_report_folder(report_id)
+        pdf_locale = request.args.get('locale', get_locale())
+        html_content = generate_pdf_report(report_folder, report, locale=pdf_locale)
+
+        response = make_response(html_content)
+        response.headers['Content-Type'] = 'text/html; charset=utf-8'
+        return response
+
+    except Exception as e:
+        logger.error(f"PDF report generation failed: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }), 500
+
+
 @report_bp.route('/<report_id>', methods=['DELETE'])
 def delete_report(report_id: str):
     """删除报告"""

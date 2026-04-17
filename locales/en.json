@@ -209,6 +209,8 @@
   },
   "step4": {
     "generatingSection": "Generating {title}...",
+    "downloadReport": "Download Report (.md)",
+    "downloadReportPdf": "View Corporate PDF Report",
     "goToInteraction": "Enter Deep Interaction",
     "waitingForReportAgent": "Waiting for Report Agent...",
     "collapse": "Collapse ▲",

@@ -248,6 +248,8 @@ def generate_ontology():
         })
         
     except Exception as e:
+        logger.error(f"Ontology generation failed: {str(e)}")
+        logger.error(traceback.format_exc())
         return jsonify({
             "success": False,
             "error": str(e),
@@ -493,18 +495,28 @@ def build_graph():
                 )
                 
             except Exception as e:
-                # 更新项目状态为失败
-                build_logger.error(f"[{task_id}] 图谱构建失败: {str(e)}")
+                build_logger.error(f"[{task_id}] Graph build failed: {str(e)}")
                 build_logger.debug(traceback.format_exc())
-                
+
+                # Produce a human-readable error for known Zep account limits
+                err_str = str(e)
+                if "episode usage limit" in err_str or ("403" in err_str and "forbidden" in err_str.lower()):
+                    friendly_error = (
+                        "Zep account episode limit reached. "
+                        "Please delete old graphs at app.getzep.com to free up quota, "
+                        "or upgrade your Zep plan."
+                    )
+                else:
+                    friendly_error = err_str
+
                 project.status = ProjectStatus.FAILED
-                project.error = str(e)
+                project.error = friendly_error
                 ProjectManager.save_project(project)
-                
+
                 task_manager.update_task(
                     task_id,
                     status=TaskStatus.FAILED,
-                    message=t('progress.buildFailed', error=str(e)),
+                    message=t('progress.buildFailed', error=friendly_error),
                     error=traceback.format_exc()
                 )
         
