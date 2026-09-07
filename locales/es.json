@@ -26,8 +26,8 @@
     "files": "archivos"
   },
   "meta": {
-    "title": "MiroFish - Predice el Futuro",
-    "description": "MiroFish - Sistema de Simulación de Opinión en Redes Sociales"
+    "title": "MinkOracle - Predice el Futuro",
+    "description": "MinkOracle - Sistema de Simulación de Opinión en Redes Sociales"
   },
   "nav": {
     "visitGithub": "Visitar nuestra página de Github"
@@ -38,7 +38,7 @@
     "heroTitle1": "Sube Reportes,",
     "heroTitle2": "Predice el Futuro",
     "heroDesc": "A partir de un solo documento, {brand} extrae semillas de realidad para auto-generar un mundo paralelo con hasta {agentScale}. Inyecta variables desde una vista divina para encontrar el {optimalSolution} en dinámicas grupales complejas.",
-    "heroDescBrand": "MiroFish",
+    "heroDescBrand": "MinkOracle",
     "heroDescAgentScale": "Agentes a escala millonaria",
     "heroDescOptimalSolution": "\"óptimo local\"",
     "slogan": "Deja que los Agentes ensayen el futuro, deja que las decisiones prevalezcan",
@@ -67,7 +67,7 @@
     "inputParams": "Parámetros de Entrada",
     "simulationPrompt": ">_ 02 / Prompt de Simulación",
     "promptPlaceholder": "// Describe tu requerimiento de simulación o predicción en lenguaje natural",
-    "engineBadge": "Motor: MiroFish-V1.0",
+    "engineBadge": "Motor: MinkOracle-V1.0",
     "startEngine": "Iniciar Motor",
     "initializing": "Inicializando..."
   },
@@ -145,7 +145,7 @@
     "setupComplete": "Configuración Completa",
     "setupCompleteDesc": "El entorno de simulación está listo. Ahora puedes iniciar la simulación.",
     "roundsConfig": "Configuración de Rondas de Simulación",
-    "roundsConfigDesc": "MiroFish planea automáticamente simular {hours} horas del mundo real, con cada ronda representando {minutesPerRound} minutos de tiempo transcurrido",
+    "roundsConfigDesc": "MinkOracle planea automáticamente simular {hours} horas del mundo real, con cada ronda representando {minutesPerRound} minutos de tiempo transcurrido",
     "customToggle": "Personalizar",
     "roundsUnit": "rondas",
     "estimatedDuration": "Para 100 Agentes: est. ~{minutes} minutos",
@@ -259,7 +259,7 @@
     "selectChatTarget": "Seleccionar objetivo de chat",
     "sendSurvey": "Enviar encuesta al mundo",
     "reportAgentChat": "Agente de Reporte - Chat",
-    "reportAgentDesc": "Versión conversacional del agente de generación de reportes con acceso a 4 herramientas profesionales y la memoria completa de MiroFish",
+    "reportAgentDesc": "Versión conversacional del agente de generación de reportes con acceso a 4 herramientas profesionales y la memoria completa de MinkOracle",
     "toolInsightForge": "InsightForge Atribución Profunda",
     "toolInsightForgeDesc": "Alinea datos de semillas del mundo real con el estado de simulación, combinando Memoria Global/Local para análisis de atribución profunda cross-temporal",
     "toolPanoramaSearch": "PanoramaSearch Seguimiento Completo",

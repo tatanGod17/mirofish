@@ -2,7 +2,10 @@
   <div class="process-page">
     <!-- 顶部导航栏 -->
     <nav class="navbar">
-      <div class="nav-brand" @click="goHome">MIROFISH</div>
+      <div class="nav-brand" @click="goHome">
+        <img src="/MinkOracle.png" alt="MinkOracle" class="nav-logo-img" />
+        MINKORACLE
+      </div>
       
       <!-- 中间步骤指示器 -->
       <div class="nav-center">
@@ -1127,6 +1130,16 @@ onUnmounted(() => {
   letter-spacing: 0.1em;
   cursor: pointer;
   transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-logo-img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  
 }
 
 .nav-brand:hover {

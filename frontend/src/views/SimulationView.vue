@@ -3,7 +3,10 @@
     <!-- Header -->
     <header class="app-header">
       <div class="header-left">
-        <div class="brand" @click="router.push('/')">MIROFISH</div>
+        <div class="brand" @click="router.push('/')">
+          <img src="/MinkOracle.png" alt="MinkOracle" class="brand-logo" />
+          MINKORACLE
+        </div>
       </div>
       
       <div class="header-center">
@@ -331,6 +334,16 @@ onMounted(async () => {
   font-size: 18px;
   letter-spacing: 1px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  
 }
 
 .header-center {

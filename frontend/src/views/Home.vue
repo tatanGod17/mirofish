@@ -2,10 +2,13 @@
   <div class="home-container">
     <!-- 顶部导航栏 -->
     <nav class="navbar">
-      <div class="nav-brand">MIROFISH</div>
+      <div class="nav-brand">
+        <img src="/MinkOracle.png" alt="MinkOracle" class="nav-logo-img" />
+        MINKORACLE
+      </div>
       <div class="nav-links">
         <LanguageSwitcher />
-        <a href="https://github.com/666ghj/MiroFish" target="_blank" class="github-link">
+        <a href="https://github.com/tatanGod17/mirofish" target="_blank" class="github-link">
           {{ $t('nav.visitGithub') }} <span class="arrow">↗</span>
         </a>
       </div>
@@ -44,7 +47,7 @@
         <div class="hero-right">
           <!-- Logo 区域 -->
           <div class="logo-container">
-            <img src="../assets/logo/MiroFish_logo_left.jpeg" alt="MiroFish Logo" class="hero-logo" />
+            <img src="/MinkOracle.png" alt="MinkOracle Logo" class="hero-logo mink-hero-logo" />
           </div>
           
           <button class="scroll-down-btn" @click="scrollToBottom">
@@ -352,6 +355,16 @@ const startSimulation = () => {
   font-weight: 800;
   letter-spacing: 1px;
   font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  
 }
 
 .nav-links {
@@ -518,8 +531,15 @@ const startSimulation = () => {
 }
 
 .hero-logo {
-  max-width: 500px; /* 调整logo大小 */
+  max-width: 500px;
   width: 100%;
+}
+
+.mink-hero-logo {
+  filter: drop-shadow(0 8px 32px rgba(99, 102, 241, 0.25));
+  padding: 20px;
+  background: rgba(27, 40, 85, 0.08);
+  border-radius: 24px;
 }
 
 .scroll-down-btn {

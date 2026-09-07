@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MinkOracle – Documentación Técnica</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --navy: #0f172a;
+    --blue: #1e3a8a;
+    --accent: #3b82f6;
+    --accent2: #06b6d4;
+    --light: #f8fafc;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #1e293b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 10pt;
+    line-height: 1.6;
+    color: #1e293b;
+    background: white;
+  }
+
+  /* ── COVER PAGE ───────────────────────────── */
+  .cover {
+    height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #0ea5e9 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+    top: -200px; right: -200px;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.07);
+    bottom: -150px; left: -150px;
+  }
+
+  .cover-badge {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.9);
+    font-size: 9pt;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    border-radius: 20px;
+    margin-bottom: 40px;
+  }
+
+  .cover-logo-area {
+    margin-bottom: 32px;
+  }
+
+  .cover-logo-ring {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 40px;
+  }
+
+  .cover h1 {
+    font-size: 48pt;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .cover h1 span { color: #38bdf8; }
+
+  .cover-subtitle {
+    font-size: 14pt;
+    color: rgba(255,255,255,0.7);
+    font-weight: 300;
+    margin-bottom: 48px;
+    letter-spacing: 1px;
+  }
+
+  .cover-divider {
+    width: 80px; height: 3px;
+    background: linear-gradient(90deg, #38bdf8, #818cf8);
+    border-radius: 2px;
+    margin: 0 auto 48px;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+  }
+
+  .cover-meta-item {
+    text-align: center;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .cover-meta-item strong {
+    display: block;
+    color: white;
+    font-size: 11pt;
+    margin-bottom: 2px;
+  }
+
+  .cover-meta-item span { font-size: 9pt; }
+
+  .cover-repo {
+    position: absolute;
+    bottom: 40px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9pt;
+    color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 8px 20px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* ── PAGE LAYOUT ──────────────────────────── */
+  @page {
+    size: A4;
+    margin: 20mm 18mm 20mm 18mm;
+  }
+
+  .page { page-break-before: always; }
+
+  /* ── TOC ──────────────────────────────────── */
+  .toc-page {
+    page-break-after: always;
+    padding: 0;
+  }
+
+  .section-header {
+    background: linear-gradient(90deg, #0f172a, #1e3a8a);
+    color: white;
+    padding: 16px 28px;
+    border-radius: 10px;
+    margin-bottom: 28px;
+  }
+
+  .section-header h2 {
+    font-size: 15pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .section-header p {
+    font-size: 9pt;
+    color: rgba(255,255,255,0.6);
+    margin-top: 2px;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+    gap: 12px;
+  }
+
+  .toc-num {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9pt;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .toc-text { flex: 1; font-weight: 500; font-size: 10pt; }
+  .toc-dots { flex: 1; border-bottom: 2px dotted #e2e8f0; margin: 0 8px; }
+  .toc-page-num { color: var(--muted); font-size: 9pt; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── CONTENT ──────────────────────────────── */
+  h2.section-title {
+    font-size: 18pt;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 36px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--accent);
+  }
+
+  h3 {
+    font-size: 12pt;
+    font-weight: 600;
+    color: var(--blue);
+    margin: 24px 0 10px;
+  }
+
+  h4 {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #334155;
+    margin: 16px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p { margin-bottom: 10px; color: #334155; }
+
+  /* ── CARDS ────────────────────────────────── */
+  .card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card-accent {
+    border-left: 4px solid var(--accent);
+    background: linear-gradient(135deg, #eff6ff, #f8fafc);
+  }
+
+  .card-warn {
+    border-left: 4px solid #f59e0b;
+    background: linear-gradient(135deg, #fffbeb, #f8fafc);
+  }
+
+  .card-green {
+    border-left: 4px solid #10b981;
+    background: linear-gradient(135deg, #ecfdf5, #f8fafc);
+  }
+
+  .card-title {
+    font-weight: 700;
+    font-size: 10pt;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── STEP CARDS ───────────────────────────── */
+  .step-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .step-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .step-card-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .step-card-header.s1 { background: linear-gradient(90deg, #1e3a8a, #2563eb); }
+  .step-card-header.s2 { background: linear-gradient(90deg, #065f46, #059669); }
+  .step-card-header.s3 { background: linear-gradient(90deg, #7c2d12, #ea580c); }
+  .step-card-header.s4 { background: linear-gradient(90deg, #4c1d95, #7c3aed); }
+  .step-card-header.s5 { background: linear-gradient(90deg, #0c4a6e, #0284c7); }
+
+  .step-num-badge {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 12pt;
+    flex-shrink: 0;
+  }
+
+  .step-card-header-text { color: white; }
+  .step-card-header-text strong { display: block; font-size: 9pt; font-weight: 700; }
+  .step-card-header-text span { font-size: 8pt; opacity: 0.8; }
+
+  .step-card-body {
+    padding: 14px 16px;
+    background: white;
+  }
+
+  .step-card-body p { font-size: 9pt; color: #475569; margin-bottom: 8px; }
+
+  .step-endpoint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #1e3a8a;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 8pt;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin: 2px;
+  }
+
+  .tag-blue { background: #dbeafe; color: #1d4ed8; }
+  .tag-green { background: #d1fae5; color: #065f46; }
+  .tag-purple { background: #ede9fe; color: #5b21b6; }
+  .tag-orange { background: #ffedd5; color: #9a3412; }
+  .tag-cyan { background: #cffafe; color: #0e7490; }
+
+  /* ── CODE BLOCKS ──────────────────────────── */
+  pre {
+    background: var(--code-bg);
+    color: #e2e8f0;
+    padding: 16px 20px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    line-height: 1.7;
+    margin: 12px 0;
+    overflow: hidden;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 8.5pt;
+    color: #1e40af;
+  }
+
+  pre code { background: none; border: none; color: inherit; padding: 0; font-size: inherit; }
+
+  .code-comment { color: #64748b; }
+  .code-key { color: #38bdf8; }
+  .code-val { color: #a3e635; }
+  .code-str { color: #f472b6; }
+
+  /* ── TABLES ───────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 9pt;
+  }
+
+  th {
+    background: linear-gradient(90deg, #0f172a, #1e3a8a);
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 8.5pt;
+    letter-spacing: 0.3px;
+  }
+
+  th:first-child { border-radius: 6px 0 0 0; }
+  th:last-child { border-radius: 0 6px 0 0; }
+
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td { background: #f8fafc; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── ARCHITECTURE ─────────────────────────── */
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+  }
+
+  .arch-box {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 8.5pt;
+    font-weight: 600;
+    text-align: center;
+    min-width: 80px;
+  }
+
+  .arch-box.green { background: linear-gradient(135deg, #065f46, #059669); }
+  .arch-box.purple { background: linear-gradient(135deg, #4c1d95, #7c3aed); }
+  .arch-box.orange { background: linear-gradient(135deg, #7c2d12, #ea580c); }
+  .arch-box.cyan { background: linear-gradient(135deg, #0c4a6e, #0284c7); }
+  .arch-box.gray { background: linear-gradient(135deg, #374151, #6b7280); }
+
+  .arch-arrow {
+    font-size: 14pt;
+    color: #94a3b8;
+    flex-shrink: 0;
+  }
+
+  /* ── CREDENTIAL BOX ───────────────────────── */
+  .cred-box {
+    background: var(--code-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+
+  .cred-box-header {
+    background: rgba(255,255,255,0.05);
+    padding: 8px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    color: #94a3b8;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cred-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-r { background: #f87171; }
+  .dot-y { background: #fbbf24; }
+  .dot-g { background: #34d399; }
+
+  .cred-content {
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    line-height: 1.8;
+    color: #e2e8f0;
+  }
+
+  /* ── ALERTS ───────────────────────────────── */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-size: 9pt;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .alert-icon { font-size: 14pt; flex-shrink: 0; line-height: 1.3; }
+  .alert-blue { background: #dbeafe; border: 1px solid #93c5fd; color: #1e3a8a; }
+  .alert-yellow { background: #fef3c7; border: 1px solid #fcd34d; color: #92400e; }
+  .alert-green { background: #d1fae5; border: 1px solid #6ee7b7; color: #065f46; }
+
+  /* ── FILE TREE ────────────────────────────── */
+  .file-tree {
+    background: var(--code-bg);
+    color: #94a3b8;
+    padding: 16px 20px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    line-height: 1.9;
+    margin: 12px 0;
+  }
+
+  .ft-dir { color: #38bdf8; font-weight: 600; }
+  .ft-file { color: #e2e8f0; }
+  .ft-comment { color: #64748b; }
+  .ft-important { color: #f472b6; font-weight: 600; }
+
+  /* ── FOOTER ───────────────────────────────── */
+  .page-footer {
+    margin-top: 40px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 8pt;
+    color: #94a3b8;
+  }
+
+  ul { padding-left: 18px; margin-bottom: 10px; }
+  ul li { margin-bottom: 4px; color: #334155; font-size: 9.5pt; }
+  ul li strong { color: #1e293b; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  .mini-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .mini-card .big-num {
+    font-size: 22pt;
+    font-weight: 800;
+    color: var(--blue);
+    display: block;
+  }
+
+  .mini-card span { font-size: 8pt; color: var(--muted); }
+
+  .divider { height: 1px; background: #e2e8f0; margin: 24px 0; }
+
+  .highlight { background: linear-gradient(90deg, #dbeafe, #ede9fe); padding: 12px 16px; border-radius: 8px; margin: 12px 0; }
+  .highlight strong { color: #1e3a8a; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ COVER -->
+<div class="cover">
+  <div class="cover-badge">Documentación Técnica Oficial</div>
+
+  <div class="cover-logo-area">
+    <div class="cover-logo-ring">🦡</div>
+  </div>
+
+  <h1>Mink<span>Oracle</span></h1>
+  <p class="cover-subtitle">Motor de Inteligencia de Enjambre Conciso y Universal</p>
+  <div class="cover-divider"></div>
+
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <strong>Versión</strong>
+      <span>v0.1-Preview</span>
+    </div>
+    <div class="cover-meta-item">
+      <strong>Licencia</strong>
+      <span>AGPL-3.0</span>
+    </div>
+    <div class="cover-meta-item">
+      <strong>Stack</strong>
+      <span>Flask · Vue 3 · OASIS · Zep</span>
+    </div>
+    <div class="cover-meta-item">
+      <strong>Fecha</strong>
+      <span>Junio 2026</span>
+    </div>
+  </div>
+
+  <div class="cover-repo">⚡ github.com/tatanGod17/mirofish</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ TOC -->
+<div class="toc-page page">
+  <div class="section-header">
+    <h2>Tabla de Contenidos</h2>
+    <p>Guía de navegación del documento</p>
+  </div>
+
+  <div class="toc-item">
+    <div class="toc-num">1</div>
+    <span class="toc-text">Visión General del Proyecto</span>
+    <div class="toc-dots"></div>
+    <span class="toc-page-num">3</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">2</div>
+    <span class="toc-text">Arquitectura del Sistema</span>
+    <div class="toc-dots"></div>
+    <span class="toc-page-num">4</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">3</div>
+    <span class="toc-text">Servicios de IA & LLM Utilizados</span>
+    <div class="toc-dots"></div>
+    <span class="toc-page-num">5</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">4</div>
+    <span class="toc-text">Configuración de Credenciales</span>
+    <div class="toc-dots"></div>
+    <span class="toc-page-num">6</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">5</div>
+    <span class="toc-text">Pipeline de 5 Pasos – Detalle Técnico</span>
+    <div class="toc-dots"></div>
+    <span class="toc-page-num">8</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">6</div>
+    <span class="toc-text">Stack Tecnológico Completo</span>
+    <div class="toc-dots"></div>
+    <span class="toc-page-num">11</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">7</div>
+    <span class="toc-text">Estructura de Archivos del Proyecto</span>
+    <div class="toc-dots"></div>
+    <span class="toc-page-num">12</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">8</div>
+    <span class="toc-text">API REST – Referencia de Endpoints</span>
+    <div class="toc-dots"></div>
+    <span class="toc-page-num">13</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">9</div>
+    <span class="toc-text">Comandos para Ejecutar el Proyecto</span>
+    <div class="toc-dots"></div>
+    <span class="toc-page-num">14</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">10</div>
+    <span class="toc-text">Repositorio & Recursos</span>
+    <div class="toc-dots"></div>
+    <span class="toc-page-num">15</span>
+  </div>
+
+  <div style="margin-top:40px">
+    <div class="three-col">
+      <div class="mini-card">
+        <span class="big-num">5</span>
+        <span>Pasos del Pipeline</span>
+      </div>
+      <div class="mini-card">
+        <span class="big-num">3</span>
+        <span>APIs de IA Integradas</span>
+      </div>
+      <div class="mini-card">
+        <span class="big-num">3</span>
+        <span>Idiomas Soportados</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PAGE 1: OVERVIEW -->
+<div class="page">
+  <h2 class="section-title">1. Visión General del Proyecto</h2>
+
+  <p><strong>MinkOracle</strong> (anteriormente MiroFish) es un motor de simulación de inteligencia de enjambre que permite predecir el comportamiento colectivo de agentes en redes sociales. A partir de un único documento (PDF, Markdown o texto), el sistema construye automáticamente un grafo de conocimiento, genera perfiles de agentes realistas y simula su interacción en plataformas como Twitter y Reddit.</p>
+
+  <div class="highlight">
+    <strong>Propuesta de valor:</strong> Sube un documento de contexto → MinkOracle genera hasta millones de agentes IA → simula sus decisiones en redes sociales → produce reportes predictivos accionables.
+  </div>
+
+  <h3>¿Qué puede hacer MinkOracle?</h3>
+  <ul>
+    <li><strong>Análisis de documentos:</strong> Extrae automáticamente entidades, relaciones y ontología de cualquier documento corporativo o de investigación.</li>
+    <li><strong>Construcción de grafos:</strong> Crea un Knowledge Graph enriquecido en Zep Cloud con todas las entidades y sus relaciones.</li>
+    <li><strong>Generación de agentes:</strong> Convierte entidades del grafo en perfiles de agentes IA con personalidades, historiales y comportamientos únicos.</li>
+    <li><strong>Simulación de redes sociales:</strong> Ejecuta la simulación en plataformas Twitter/Reddit con el framework OASIS/CAMEL-AI.</li>
+    <li><strong>Reportes inteligentes:</strong> El ReportAgent utiliza razonamiento ReACT para generar análisis profundos con insights accionables.</li>
+    <li><strong>Chat interactivo:</strong> Interactúa con el ReportAgent para hacer preguntas de seguimiento sobre los resultados.</li>
+  </ul>
+
+  <h3>Casos de Uso Principales</h3>
+  <div class="two-col">
+    <div class="card card-accent">
+      <div class="card-title">📊 Análisis de Opinión Pública</div>
+      <p style="font-size:9pt;color:#475569;">Predice cómo reaccionará el público ante lanzamientos de productos, campañas o eventos usando agentes que simulan comportamiento real.</p>
+    </div>
+    <div class="card card-green">
+      <div class="card-title">🔬 Investigación Social</div>
+      <p style="font-size:9pt;color:#475569;">Estudia dinámicas grupales complejas: propagación de información, formación de opiniones, detección de cámaras de eco.</p>
+    </div>
+    <div class="card card-accent">
+      <div class="card-title">🎯 Marketing Predictivo</div>
+      <p style="font-size:9pt;color:#475569;">Optimiza estrategias de comunicación antes de ejecutarlas, encontrando el "óptimo local" entre diferentes enfoques.</p>
+    </div>
+    <div class="card card-green">
+      <div class="card-title">⚡ Análisis de Crisis</div>
+      <p style="font-size:9pt;color:#475569;">Simula escenarios de crisis para anticipar reacciones y preparar respuestas estratégicas con antelación.</p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>MinkOracle – Documentación Técnica v0.1</span>
+    <span>github.com/tatanGod17/mirofish</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PAGE 2: ARCHITECTURE -->
+<div class="page">
+  <h2 class="section-title">2. Arquitectura del Sistema</h2>
+
+  <h3>Flujo de Datos General</h3>
+  <div class="arch-flow">
+    <div class="arch-box">📄 Documento</div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box">LLM<br><small>Ontología</small></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box green">Zep Cloud<br><small>Knowledge Graph</small></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box orange">OASIS<br><small>Simulación</small></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box purple">ReportAgent<br><small>Análisis ReACT</small></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box cyan">Reporte PDF<br><small>+ Chat</small></div>
+  </div>
+
+  <h3>Componentes Principales</h3>
+  <table>
+    <tr>
+      <th>Capa</th>
+      <th>Tecnología</th>
+      <th>Puerto / URL</th>
+      <th>Responsabilidad</th>
+    </tr>
+    <tr>
+      <td><strong>Frontend</strong></td>
+      <td>Vue 3 + Vite + D3.js</td>
+      <td><code>localhost:3000</code></td>
+      <td>UI interactiva de las 5 fases del pipeline</td>
+    </tr>
+    <tr>
+      <td><strong>Backend API</strong></td>
+      <td>Flask 3.0 + Python 3.11+</td>
+      <td><code>localhost:5001</code></td>
+      <td>Orquestador REST de todos los servicios</td>
+    </tr>
+    <tr>
+      <td><strong>Knowledge Graph</strong></td>
+      <td>Zep Cloud API</td>
+      <td>Cloud (API Key)</td>
+      <td>Almacena y consulta entidades y relaciones</td>
+    </tr>
+    <tr>
+      <td><strong>LLM Gateway</strong></td>
+      <td>OpenAI SDK (formato compatible)</td>
+      <td>Configurable via .env</td>
+      <td>Generación de texto, análisis, razonamiento</td>
+    </tr>
+    <tr>
+      <td><strong>Simulación</strong></td>
+      <td>OASIS + CAMEL-AI</td>
+      <td>Subprocess local</td>
+      <td>Motor de simulación multi-agente en redes sociales</td>
+    </tr>
+  </table>
+
+  <h3>Blueprints de la API REST</h3>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">🗂️ /api/graph</div>
+      <p style="font-size:9pt;color:#475569;">Gestión de proyectos, generación de ontología y construcción del Knowledge Graph en Zep.</p>
+      <span class="tag tag-blue">graph_bp</span>
+      <span class="tag tag-green">project management</span>
+    </div>
+    <div class="card">
+      <div class="card-title">⚙️ /api/simulation</div>
+      <p style="font-size:9pt;color:#475569;">Preparación de perfiles de agentes, configuración de simulación, inicio/parada y monitoreo en tiempo real.</p>
+      <span class="tag tag-orange">simulation_bp</span>
+      <span class="tag tag-green">async execution</span>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 /api/report</div>
+      <p style="font-size:9pt;color:#475569;">Generación de reportes con ReportAgent, exportación PDF y chat interactivo con el agente.</p>
+      <span class="tag tag-purple">report_bp</span>
+      <span class="tag tag-cyan">ReACT pattern</span>
+    </div>
+    <div class="card">
+      <div class="card-title">📁 Almacenamiento Local</div>
+      <p style="font-size:9pt;color:#475569;">Todos los datos se persisten en JSON/JSONL en <code>backend/uploads/</code> — sin base de datos externa.</p>
+      <span class="tag tag-blue">projects/</span>
+      <span class="tag tag-orange">simulations/</span>
+      <span class="tag tag-purple">reports/</span>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>MinkOracle – Documentación Técnica v0.1</span>
+    <span>github.com/tatanGod17/mirofish</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PAGE 3: AI SERVICES -->
+<div class="page">
+  <h2 class="section-title">3. Servicios de IA & LLM Utilizados</h2>
+
+  <div class="alert alert-blue">
+    <span class="alert-icon">ℹ️</span>
+    <div>MinkOracle usa el <strong>formato OpenAI SDK</strong> como interfaz unificada. Esto permite conectar cualquier proveedor compatible (Alibaba Qwen, OpenAI GPT, Deepseek, Mistral, etc.) simplemente cambiando las variables de entorno.</div>
+  </div>
+
+  <h3>Proveedor LLM Principal — Alibaba Qwen (Recomendado)</h3>
+  <div class="card card-accent">
+    <div class="card-title">🤖 Alibaba Cloud Bailian — Modelo: qwen-plus</div>
+    <p style="font-size:9pt;color:#475569;">Proveedor recomendado por costo-eficiencia. Soporta el formato OpenAI SDK directamente.</p>
+    <ul style="font-size:9pt;margin-top:8px;">
+      <li><strong>URL base:</strong> <code>https://dashscope.aliyuncs.com/compatible-mode/v1</code></li>
+      <li><strong>Modelos recomendados:</strong> <code>qwen-plus</code>, <code>qwen-turbo</code>, <code>qwen-max</code></li>
+      <li><strong>Consola:</strong> https://bailian.console.aliyun.com/</li>
+      <li><strong>Nota:</strong> Las simulaciones consumen bastante — comenzar con menos de 40 rondas.</li>
+    </ul>
+  </div>
+
+  <h3>Proveedor LLM Alternativo — OpenAI</h3>
+  <div class="card">
+    <div class="card-title">🔷 OpenAI — Modelos GPT-4o / GPT-4o-mini</div>
+    <p style="font-size:9pt;color:#475569;">Compatible directamente. Solo cambiar la API Key y dejar la URL vacía (usa el default de OpenAI).</p>
+    <ul style="font-size:9pt;margin-top:8px;">
+      <li><strong>URL base:</strong> <code>https://api.openai.com/v1</code> (default del SDK)</li>
+      <li><strong>Modelos:</strong> <code>gpt-4o</code>, <code>gpt-4o-mini</code>, <code>o1-mini</code></li>
+    </ul>
+  </div>
+
+  <h3>Zep Cloud — Knowledge Graph & Memoria</h3>
+  <div class="card card-green">
+    <div class="card-title">🕸️ Zep Cloud — Motor de Grafo de Conocimiento</div>
+    <p style="font-size:9pt;color:#475569;">Servicio central para almacenar, enriquecer y consultar el grafo de entidades. El tier gratuito mensual soporta casos de uso simples.</p>
+    <ul style="font-size:9pt;margin-top:8px;">
+      <li><strong>Función en Step 2:</strong> Construye el Knowledge Graph con ontología definida en Step 1</li>
+      <li><strong>Función en Step 3:</strong> Lee entidades filtradas para generar perfiles de agentes</li>
+      <li><strong>Función en Step 5:</strong> ReportAgent usa Zep para búsqueda híbrida (InsightForge, PanoramaSearch)</li>
+      <li><strong>Registro:</strong> https://app.getzep.com/</li>
+    </ul>
+  </div>
+
+  <h3>OASIS + CAMEL-AI — Motor de Simulación</h3>
+  <div class="card card-warn">
+    <div class="card-title">⚡ OASIS (camel-oasis 0.2.5) + CAMEL-AI (camel-ai 0.2.78)</div>
+    <p style="font-size:9pt;color:#475569;">Framework de código abierto para simulación multi-agente en redes sociales. Cada agente simula comportamiento en Twitter y/o Reddit.</p>
+    <ul style="font-size:9pt;margin-top:8px;">
+      <li><strong>Plataformas simuladas:</strong> Twitter (tweets, likes, retweets, follows) y Reddit (posts, comments, upvotes)</li>
+      <li><strong>Escalabilidad:</strong> Soporta desde decenas hasta millones de agentes (depende de recursos)</li>
+      <li><strong>No requiere API keys:</strong> Simulación completamente local</li>
+    </ul>
+  </div>
+
+  <h3>Herramientas del ReportAgent (Zep Tools)</h3>
+  <table>
+    <tr>
+      <th>Herramienta</th>
+      <th>Función</th>
+      <th>Cuándo se usa</th>
+    </tr>
+    <tr>
+      <td><strong>InsightForge</strong></td>
+      <td>Búsqueda híbrida profunda con sub-preguntas generadas por LLM y recuperación multi-dimensional</td>
+      <td>Análisis principal de cada sección del reporte</td>
+    </tr>
+    <tr>
+      <td><strong>PanoramaSearch</strong></td>
+      <td>Búsqueda amplia incluyendo datos expirados en el grafo de Zep</td>
+      <td>Contexto histórico y datos de largo plazo</td>
+    </tr>
+    <tr>
+      <td><strong>Interview</strong></td>
+      <td>Conversación directa con agentes individuales del grafo</td>
+      <td>Perspectivas individuales de agentes específicos</td>
+    </tr>
+  </table>
+
+  <div class="page-footer">
+    <span>MinkOracle – Documentación Técnica v0.1</span>
+    <span>github.com/tatanGod17/mirofish</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PAGE 4: CREDENTIALS -->
+<div class="page">
+  <h2 class="section-title">4. Configuración de Credenciales</h2>
+
+  <div class="alert alert-yellow">
+    <span class="alert-icon">⚠️</span>
+    <div><strong>Archivo de credenciales:</strong> Crea el archivo <code>backend/.env</code> basándote en el template <code>backend/.env.example</code>. <strong>Nunca subas el archivo .env al repositorio.</strong> Ya está incluido en .gitignore.</div>
+  </div>
+
+  <h3>Archivo: <code>backend/.env</code></h3>
+
+  <div class="cred-box">
+    <div class="cred-box-header">
+      <div class="cred-dot dot-r"></div>
+      <div class="cred-dot dot-y"></div>
+      <div class="cred-dot dot-g"></div>
+      <span>backend/.env</span>
+    </div>
+    <div class="cred-content">
+<span class="code-comment"># ══════════════════════════════════════════════════════════</span>
+<span class="code-comment"># CONFIGURACIÓN LLM PRINCIPAL (requerido)</span>
+<span class="code-comment"># Soporta cualquier API con formato OpenAI SDK</span>
+<span class="code-comment"># Recomendado: Alibaba Qwen — https://bailian.console.aliyun.com/</span>
+<span class="code-comment"># ══════════════════════════════════════════════════════════</span>
+
+<span class="code-key">LLM_API_KEY</span>=<span class="code-val">sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+<span class="code-key">LLM_BASE_URL</span>=<span class="code-str">https://dashscope.aliyuncs.com/compatible-mode/v1</span>
+<span class="code-key">LLM_MODEL_NAME</span>=<span class="code-str">qwen-plus</span>
+
+<span class="code-comment"># ══════════════════════════════════════════════════════════</span>
+<span class="code-comment"># ZEP CLOUD — Knowledge Graph (requerido)</span>
+<span class="code-comment"># Registro gratuito: https://app.getzep.com/</span>
+<span class="code-comment"># ══════════════════════════════════════════════════════════</span>
+
+<span class="code-key">ZEP_API_KEY</span>=<span class="code-val">z_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+
+<span class="code-comment"># ══════════════════════════════════════════════════════════</span>
+<span class="code-comment"># LLM BOOST (opcional) — LLM secundario más rápido/potente</span>
+<span class="code-comment"># Si no se usa, NO incluir estas variables en el .env</span>
+<span class="code-comment"># ══════════════════════════════════════════════════════════</span>
+
+<span class="code-key">LLM_BOOST_API_KEY</span>=<span class="code-val">sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+<span class="code-key">LLM_BOOST_BASE_URL</span>=<span class="code-str">https://api.openai.com/v1</span>
+<span class="code-key">LLM_BOOST_MODEL_NAME</span>=<span class="code-str">gpt-4o</span>
+    </div>
+  </div>
+
+  <h3>Dónde Obtener Cada Credencial</h3>
+  <table>
+    <tr>
+      <th>Variable</th>
+      <th>Proveedor</th>
+      <th>URL de Registro</th>
+      <th>¿Requerido?</th>
+    </tr>
+    <tr>
+      <td><code>LLM_API_KEY</code></td>
+      <td>Alibaba Bailian / OpenAI / cualquier compatible</td>
+      <td>bailian.console.aliyun.com</td>
+      <td><span class="tag tag-orange">Requerido</span></td>
+    </tr>
+    <tr>
+      <td><code>LLM_BASE_URL</code></td>
+      <td>URL del endpoint del proveedor LLM</td>
+      <td>Según proveedor elegido</td>
+      <td><span class="tag tag-orange">Requerido</span></td>
+    </tr>
+    <tr>
+      <td><code>LLM_MODEL_NAME</code></td>
+      <td>Nombre del modelo a usar</td>
+      <td>Según proveedor (ej: qwen-plus)</td>
+      <td><span class="tag tag-orange">Requerido</span></td>
+    </tr>
+    <tr>
+      <td><code>ZEP_API_KEY</code></td>
+      <td>Zep Cloud</td>
+      <td>app.getzep.com</td>
+      <td><span class="tag tag-orange">Requerido</span></td>
+    </tr>
+    <tr>
+      <td><code>LLM_BOOST_API_KEY</code></td>
+      <td>Cualquier proveedor LLM alternativo</td>
+      <td>Según elección</td>
+      <td><span class="tag tag-green">Opcional</span></td>
+    </tr>
+  </table>
+
+  <h3>Configuración para OpenAI (alternativa)</h3>
+  <div class="cred-box">
+    <div class="cred-box-header">
+      <div class="cred-dot dot-r"></div>
+      <div class="cred-dot dot-y"></div>
+      <div class="cred-dot dot-g"></div>
+      <span>backend/.env — Configuración OpenAI</span>
+    </div>
+    <div class="cred-content">
+<span class="code-key">LLM_API_KEY</span>=<span class="code-val">sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+<span class="code-key">LLM_BASE_URL</span>=<span class="code-str">https://api.openai.com/v1</span>
+<span class="code-key">LLM_MODEL_NAME</span>=<span class="code-str">gpt-4o-mini</span>
+<span class="code-key">ZEP_API_KEY</span>=<span class="code-val">z_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+    </div>
+  </div>
+
+  <div class="alert alert-blue">
+    <span class="alert-icon">💡</span>
+    <div>Si usas OpenAI y recibes error <strong>429 (insufficient_quota)</strong>, recarga créditos en <code>platform.openai.com/settings/billing</code>. Los errores de cuota son del proveedor, no del sistema.</div>
+  </div>
+
+  <div class="page-footer">
+    <span>MinkOracle – Documentación Técnica v0.1</span>
+    <span>github.com/tatanGod17/mirofish</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PAGE 5: PIPELINE -->
+<div class="page">
+  <h2 class="section-title">5. Pipeline de 5 Pasos – Detalle Técnico</h2>
+
+  <div class="alert alert-green">
+    <span class="alert-icon">✅</span>
+    <div>El pipeline es <strong>secuencial</strong>: cada paso produce outputs que son inputs del siguiente. El estado se persiste en disco, permitiendo retomar desde cualquier punto.</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-card" style="margin-top:20px">
+    <div class="step-card-header s1">
+      <div class="step-num-badge">1</div>
+      <div class="step-card-header-text">
+        <strong>Generación de Ontología & Construcción del Grafo</strong>
+        <span>OntologyGenerator + GraphBuilderService</span>
+      </div>
+    </div>
+    <div class="step-card-body">
+      <p><strong>¿Qué hace?</strong> El usuario sube uno o más documentos (PDF/MD/TXT) junto con una descripción del objetivo de la simulación. El sistema extrae el texto, lo analiza con LLM y genera una ontología estructurada con tipos de entidades y relaciones. Luego construye el Knowledge Graph en Zep Cloud.</p>
+
+      <span class="step-endpoint">POST /api/graph/ontology/generate → Genera ontología (10 tipos de entidad, 6-10 tipos de relación)</span>
+      <span class="step-endpoint">POST /api/graph/build → Construye el Knowledge Graph en Zep con la ontología</span>
+
+      <div style="margin-top:8px">
+        <span class="tag tag-blue">PyMuPDF</span>
+        <span class="tag tag-blue">LLM (JSON mode)</span>
+        <span class="tag tag-green">Zep Cloud Graph</span>
+        <span class="tag tag-cyan">Chunking configurable</span>
+      </div>
+
+      <p style="margin-top:8px"><strong>Outputs:</strong> <code>project.json</code> con texto extraído, ontología definida y <code>graph_id</code> de Zep.</p>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-card" style="margin-top:16px">
+    <div class="step-card-header s2">
+      <div class="step-num-badge">2</div>
+      <div class="step-card-header-text">
+        <strong>Preparación del Entorno de Simulación</strong>
+        <span>ZepEntityReader + OasisProfileGenerator + SimulationConfigGenerator</span>
+      </div>
+    </div>
+    <div class="step-card-body">
+      <p><strong>¿Qué hace?</strong> Lee las entidades del Knowledge Graph de Zep y convierte cada una en un perfil de agente OASIS con personalidad, historia y comportamientos detallados. Simultáneamente genera la configuración completa de la simulación usando LLM.</p>
+
+      <span class="step-endpoint">POST /api/simulation/prepare → Lee entidades de Zep + genera perfiles de agentes</span>
+
+      <div style="margin-top:8px">
+        <span class="tag tag-green">Zep Entity Reader</span>
+        <span class="tag tag-orange">OASIS Profiles</span>
+        <span class="tag tag-blue">LLM (persona generation)</span>
+        <span class="tag tag-cyan">5 workers paralelos</span>
+      </div>
+
+      <p style="margin-top:8px"><strong>Outputs:</strong> <code>reddit_profiles.json</code>, <code>twitter_profiles.csv</code>, <code>simulation_config.json</code></p>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-card" style="margin-top:16px">
+    <div class="step-card-header s3">
+      <div class="step-num-badge">3</div>
+      <div class="step-card-header-text">
+        <strong>Ejecución de la Simulación</strong>
+        <span>SimulationRunner (subprocess OASIS/CAMEL-AI)</span>
+      </div>
+    </div>
+    <div class="step-card-body">
+      <p><strong>¿Qué hace?</strong> Lanza la simulación en un subprocess Python independiente. Los agentes interactúan en plataformas simuladas de Twitter y/o Reddit por N rondas. Cada acción (tweet, like, comment, follow) queda registrada. Actualizaciones en tiempo real vía polling.</p>
+
+      <span class="step-endpoint">POST /api/simulation/start → Inicia subprocess de simulación</span>
+      <span class="step-endpoint">GET /api/simulation/run-state/{id} → Estado en tiempo real</span>
+      <span class="step-endpoint">POST /api/simulation/stop → Detiene la simulación</span>
+
+      <div style="margin-top:8px">
+        <span class="tag tag-orange">camel-oasis 0.2.5</span>
+        <span class="tag tag-orange">camel-ai 0.2.78</span>
+        <span class="tag tag-blue">LLM (agent decisions)</span>
+        <span class="tag tag-green">Twitter + Reddit</span>
+      </div>
+
+      <p style="margin-top:8px"><strong>Outputs:</strong> <code>actions.jsonl</code> (log completo de acciones), <code>run_state.json</code> (estado de ejecución)</p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>MinkOracle – Documentación Técnica v0.1</span>
+    <span>github.com/tatanGod17/mirofish</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PAGE 6: PIPELINE cont. -->
+<div class="page">
+
+  <!-- STEP 4 -->
+  <div class="step-card" style="margin-top:8px">
+    <div class="step-card-header s4">
+      <div class="step-num-badge">4</div>
+      <div class="step-card-header-text">
+        <strong>Generación del Reporte</strong>
+        <span>ReportAgent – Patrón ReACT</span>
+      </div>
+    </div>
+    <div class="step-card-body">
+      <p><strong>¿Qué hace?</strong> El ReportAgent utiliza el patrón ReACT (Razonamiento → Acción → Observación) para generar un reporte multi-sección de análisis de la simulación. Llama herramientas de Zep para recuperar contexto relevante, analiza los logs de acciones y produce insights profundos con hasta 2 rondas de reflexión por sección.</p>
+
+      <span class="step-endpoint">POST /api/report/generate → Genera reporte asíncrono con ReportAgent</span>
+      <span class="step-endpoint">GET /api/report/{id} → Recupera el reporte generado (texto + PDF)</span>
+
+      <div style="margin-top:8px">
+        <span class="tag tag-purple">ReACT Pattern</span>
+        <span class="tag tag-blue">LLM (temp=0.5)</span>
+        <span class="tag tag-green">InsightForge + PanoramaSearch</span>
+        <span class="tag tag-cyan">Max 5 tool calls</span>
+      </div>
+
+      <p style="margin-top:8px"><strong>Outputs:</strong> <code>report.md</code>, <code>report.pdf</code> (HTML corporativo), <code>agent_log.jsonl</code> (trazabilidad completa del razonamiento)</p>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step-card" style="margin-top:16px">
+    <div class="step-card-header s5">
+      <div class="step-num-badge">5</div>
+      <div class="step-card-header-text">
+        <strong>Interacción Profunda</strong>
+        <span>ReportAgent – Modo Chat</span>
+      </div>
+    </div>
+    <div class="step-card-body">
+      <p><strong>¿Qué hace?</strong> Permite al usuario hacer preguntas de seguimiento al ReportAgent. El agente mantiene contexto del reporte generado y puede recuperar información adicional del Knowledge Graph de Zep para responder preguntas específicas sobre la simulación.</p>
+
+      <span class="step-endpoint">POST /api/report/{id}/chat → Envía mensaje al ReportAgent</span>
+
+      <div style="margin-top:8px">
+        <span class="tag tag-cyan">Chat contextual</span>
+        <span class="tag tag-green">Zep hybrid search</span>
+        <span class="tag tag-blue">LLM conversational</span>
+        <span class="tag tag-purple">Historial persistente</span>
+      </div>
+
+      <p style="margin-top:8px"><strong>Outputs:</strong> Respuestas en tiempo real con razonamiento trazable. El historial de conversación se persiste con el reporte.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:24px">Diagrama de Estado de la Simulación</h3>
+  <div class="arch-flow" style="flex-direction:column;align-items:flex-start;gap:4px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="arch-box gray" style="min-width:100px;font-size:8pt;">created</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="min-width:100px;font-size:8pt;">preparing</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box green" style="min-width:100px;font-size:8pt;">ready</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box orange" style="min-width:100px;font-size:8pt;">running</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box purple" style="min-width:100px;font-size:8pt;">completed</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+      <div style="width:100px;text-align:center;font-size:8pt;color:#94a3b8">Simulación creada</div>
+      <div style="width:16px"></div>
+      <div style="width:100px;text-align:center;font-size:8pt;color:#94a3b8">Generando perfiles</div>
+      <div style="width:16px"></div>
+      <div style="width:100px;text-align:center;font-size:8pt;color:#94a3b8">Listo para iniciar</div>
+      <div style="width:16px"></div>
+      <div style="width:100px;text-align:center;font-size:8pt;color:#94a3b8">Ejecutando OASIS</div>
+      <div style="width:16px"></div>
+      <div style="width:100px;text-align:center;font-size:8pt;color:#94a3b8">Listo para reporte</div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>MinkOracle – Documentación Técnica v0.1</span>
+    <span>github.com/tatanGod17/mirofish</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PAGE 7: TECH STACK -->
+<div class="page">
+  <h2 class="section-title">6. Stack Tecnológico Completo</h2>
+
+  <h3>Backend — Python</h3>
+  <table>
+    <tr>
+      <th>Paquete</th>
+      <th>Versión</th>
+      <th>Uso en el Proyecto</th>
+    </tr>
+    <tr>
+      <td><code>flask</code></td>
+      <td>≥3.0.0</td>
+      <td>Framework web REST API — servidor principal en puerto 5001</td>
+    </tr>
+    <tr>
+      <td><code>flask-cors</code></td>
+      <td>≥6.0.0</td>
+      <td>Habilita CORS para que el frontend Vue pueda comunicarse</td>
+    </tr>
+    <tr>
+      <td><code>openai</code></td>
+      <td>≥1.0.0</td>
+      <td>SDK unificado para todos los proveedores LLM</td>
+    </tr>
+    <tr>
+      <td><code>zep-cloud</code></td>
+      <td>3.13.0</td>
+      <td>Knowledge Graph: almacenamiento y consulta de entidades</td>
+    </tr>
+    <tr>
+      <td><code>camel-oasis</code></td>
+      <td>0.2.5</td>
+      <td>Framework OASIS para simulación de redes sociales</td>
+    </tr>
+    <tr>
+      <td><code>camel-ai</code></td>
+      <td>0.2.78</td>
+      <td>Framework multi-agente base para OASIS</td>
+    </tr>
+    <tr>
+      <td><code>torch</code></td>
+      <td>≥2.0.0,≤2.2.2</td>
+      <td>Deep learning requerido por CAMEL-AI (macOS Intel: ≤2.2.2)</td>
+    </tr>
+    <tr>
+      <td><code>PyMuPDF</code></td>
+      <td>≥1.24.0</td>
+      <td>Extracción de texto de documentos PDF</td>
+    </tr>
+    <tr>
+      <td><code>python-dotenv</code></td>
+      <td>≥1.0.0</td>
+      <td>Carga variables de entorno desde archivo .env</td>
+    </tr>
+    <tr>
+      <td><code>pydantic</code></td>
+      <td>≥2.0.0</td>
+      <td>Validación y serialización de modelos de datos</td>
+    </tr>
+    <tr>
+      <td><code>charset-normalizer</code> / <code>chardet</code></td>
+      <td>≥3.0.0 / ≥5.0.0</td>
+      <td>Detección de encoding para archivos de texto no-UTF8</td>
+    </tr>
+  </table>
+
+  <h3>Frontend — JavaScript / Vue</h3>
+  <table>
+    <tr>
+      <th>Paquete</th>
+      <th>Versión</th>
+      <th>Uso en el Proyecto</th>
+    </tr>
+    <tr>
+      <td><code>vue</code></td>
+      <td>^3.5.24</td>
+      <td>Framework de UI — Composition API con &lt;script setup&gt;</td>
+    </tr>
+    <tr>
+      <td><code>vue-router</code></td>
+      <td>^4.6.3</td>
+      <td>Navegación SPA entre las 5 vistas del pipeline</td>
+    </tr>
+    <tr>
+      <td><code>vue-i18n</code></td>
+      <td>^11.3.0</td>
+      <td>Internacionalización — Español, English, 中文</td>
+    </tr>
+    <tr>
+      <td><code>axios</code></td>
+      <td>^1.14.0</td>
+      <td>Cliente HTTP para comunicación con el backend Flask</td>
+    </tr>
+    <tr>
+      <td><code>d3</code></td>
+      <td>^7.9.0</td>
+      <td>Visualización del Knowledge Graph (nodos y aristas)</td>
+    </tr>
+    <tr>
+      <td><code>vite</code></td>
+      <td>^5.4.21</td>
+      <td>Build tool y servidor de desarrollo (HMR)</td>
+    </tr>
+  </table>
+
+  <h3>Herramientas de Desarrollo</h3>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">🐍 Gestión de Dependencias Python</div>
+      <p style="font-size:9pt;color:#475569;"><code>uv</code> — Gestor de paquetes Python ultrarrápido. Reemplaza pip + virtualenv. Los comandos del proyecto usan <code>uv run python ...</code></p>
+    </div>
+    <div class="card">
+      <div class="card-title">📦 Gestor de Paquetes Node</div>
+      <p style="font-size:9pt;color:#475569;"><code>npm</code> — Gestor estándar para el frontend Vue. Comandos: <code>npm install</code> y <code>npm run dev</code></p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>MinkOracle – Documentación Técnica v0.1</span>
+    <span>github.com/tatanGod17/mirofish</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PAGE 8: FILE STRUCTURE -->
+<div class="page">
+  <h2 class="section-title">7. Estructura de Archivos del Proyecto</h2>
+
+  <div class="file-tree">
+<span class="ft-dir">MiroFish/</span>  <span class="ft-comment">← Raíz del proyecto</span>
+├── <span class="ft-dir">backend/</span>
+│   ├── <span class="ft-important">.env</span>                       <span class="ft-comment">← CREDENCIALES (no commitear)</span>
+│   ├── <span class="ft-file">.env.example</span>               <span class="ft-comment">← Template de credenciales</span>
+│   ├── <span class="ft-file">pyproject.toml</span>             <span class="ft-comment">← Dependencias Python (uv)</span>
+│   ├── <span class="ft-file">run.py</span>                     <span class="ft-comment">← Entry point Flask (puerto 5001)</span>
+│   └── <span class="ft-dir">app/</span>
+│       ├── <span class="ft-file">__init__.py</span>            <span class="ft-comment">← Factory Flask + blueprints</span>
+│       ├── <span class="ft-dir">api/</span>
+│       │   ├── <span class="ft-file">graph.py</span>           <span class="ft-comment">← Endpoints /api/graph/*</span>
+│       │   ├── <span class="ft-file">simulation.py</span>      <span class="ft-comment">← Endpoints /api/simulation/*</span>
+│       │   └── <span class="ft-file">report.py</span>          <span class="ft-comment">← Endpoints /api/report/*</span>
+│       ├── <span class="ft-dir">services/</span>              <span class="ft-comment">← Lógica de negocio principal</span>
+│       │   ├── <span class="ft-important">ontology_generator.py</span>  <span class="ft-comment">← Step 1: Extracción de ontología</span>
+│       │   ├── <span class="ft-important">graph_builder.py</span>       <span class="ft-comment">← Step 1: Construcción Knowledge Graph</span>
+│       │   ├── <span class="ft-important">zep_entity_reader.py</span>   <span class="ft-comment">← Step 2: Lectura de entidades Zep</span>
+│       │   ├── <span class="ft-important">oasis_profile_generator.py</span> <span class="ft-comment">← Step 2: Perfiles de agentes</span>
+│       │   ├── <span class="ft-important">simulation_config_generator.py</span> <span class="ft-comment">← Step 2: Config simulación</span>
+│       │   ├── <span class="ft-important">simulation_runner.py</span>    <span class="ft-comment">← Step 3: Ejecución OASIS</span>
+│       │   ├── <span class="ft-important">report_agent.py</span>        <span class="ft-comment">← Step 4-5: ReportAgent ReACT</span>
+│       │   ├── <span class="ft-file">pdf_generator.py</span>       <span class="ft-comment">← Generación de PDF corporativo</span>
+│       │   ├── <span class="ft-file">simulation_manager.py</span>  <span class="ft-comment">← Gestión de ciclo de vida simulación</span>
+│       │   ├── <span class="ft-file">zep_tools.py</span>           <span class="ft-comment">← Herramientas Zep del ReportAgent</span>
+│       │   └── <span class="ft-file">zep_graph_memory_updater.py</span> <span class="ft-comment">← Actualización grafo post-sim</span>
+│       └── <span class="ft-dir">utils/</span>
+│           ├── <span class="ft-file">llm_client.py</span>          <span class="ft-comment">← Cliente LLM unificado (retry, JSON)</span>
+│           └── <span class="ft-file">file_parser.py</span>         <span class="ft-comment">← Parser PDF/MD/TXT</span>
+├── <span class="ft-dir">frontend/</span>
+│   ├── <span class="ft-file">package.json</span>               <span class="ft-comment">← Dependencias npm</span>
+│   ├── <span class="ft-file">index.html</span>                 <span class="ft-comment">← Entry point HTML (favicon, título)</span>
+│   ├── <span class="ft-dir">public/</span>
+│   │   └── <span class="ft-important">MinkOracle.png</span>         <span class="ft-comment">← Logo oficial (SVG original en mink_logo.svg)</span>
+│   └── <span class="ft-dir">src/</span>
+│       ├── <span class="ft-dir">views/</span>                 <span class="ft-comment">← Vistas de cada paso</span>
+│       │   ├── <span class="ft-file">Home.vue</span>           <span class="ft-comment">← Landing page</span>
+│       │   ├── <span class="ft-file">Process.vue</span>        <span class="ft-comment">← Steps 1-2 (grafo + preparación)</span>
+│       │   ├── <span class="ft-file">SimulationRunView.vue</span> <span class="ft-comment">← Step 3 (simulación)</span>
+│       │   ├── <span class="ft-file">ReportView.vue</span>     <span class="ft-comment">← Step 4 (reporte)</span>
+│       │   └── <span class="ft-file">InteractionView.vue</span> <span class="ft-comment">← Step 5 (chat)</span>
+│       └── <span class="ft-dir">components/</span>
+│           ├── <span class="ft-file">Step1GraphBuild.vue</span>    <span class="ft-comment">← Upload + ontología</span>
+│           ├── <span class="ft-file">Step2EnvSetup.vue</span>      <span class="ft-comment">← Agentes + config</span>
+│           ├── <span class="ft-file">Step3Simulation.vue</span>    <span class="ft-comment">← Monitor simulación</span>
+│           ├── <span class="ft-file">Step4Report.vue</span>        <span class="ft-comment">← Viewer + export PDF</span>
+│           └── <span class="ft-file">Step5Interaction.vue</span>   <span class="ft-comment">← Chat con agente</span>
+└── <span class="ft-dir">locales/</span>                       <span class="ft-comment">← i18n: en.json / es.json / zh.json</span>
+  </div>
+
+  <div class="page-footer">
+    <span>MinkOracle – Documentación Técnica v0.1</span>
+    <span>github.com/tatanGod17/mirofish</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PAGE 9: API REF -->
+<div class="page">
+  <h2 class="section-title">8. API REST – Referencia de Endpoints</h2>
+
+  <h3>Blueprint: Graph (<code>/api/graph</code>)</h3>
+  <table>
+    <tr><th>Método</th><th>Endpoint</th><th>Descripción</th></tr>
+    <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/graph/upload</code></td><td>Sube documentos al proyecto</td></tr>
+    <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/graph/ontology/generate</code></td><td>Genera ontología con LLM desde documentos</td></tr>
+    <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/graph/build</code></td><td>Construye Knowledge Graph en Zep</td></tr>
+    <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/graph/data/{graph_id}</code></td><td>Obtiene nodos y aristas para visualización D3</td></tr>
+    <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/graph/project/{project_id}</code></td><td>Datos del proyecto (metadata, graph_id)</td></tr>
+    <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/graph/history</code></td><td>Lista todos los proyectos históricos</td></tr>
+  </table>
+
+  <h3>Blueprint: Simulation (<code>/api/simulation</code>)</h3>
+  <table>
+    <tr><th>Método</th><th>Endpoint</th><th>Descripción</th></tr>
+    <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/simulation/create</code></td><td>Crea nueva simulación para un proyecto</td></tr>
+    <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/simulation/prepare</code></td><td>Genera perfiles de agentes + config desde Zep</td></tr>
+    <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/simulation/start</code></td><td>Inicia el subprocess de simulación OASIS</td></tr>
+    <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/simulation/stop</code></td><td>Detiene la simulación en curso</td></tr>
+    <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/simulation/close-env</code></td><td>Cierra el entorno de simulación limpiamente</td></tr>
+    <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/simulation/{id}</code></td><td>Estado y metadata de la simulación</td></tr>
+    <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/simulation/run-state/{id}</code></td><td>Estado en tiempo real (rondas, acciones, agentes)</td></tr>
+    <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/simulation/config/{id}</code></td><td>Configuración de tiempos y parámetros</td></tr>
+    <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/simulation/env-status</code></td><td>Estado del entorno de simulación (alive/dead)</td></tr>
+  </table>
+
+  <h3>Blueprint: Report (<code>/api/report</code>)</h3>
+  <table>
+    <tr><th>Método</th><th>Endpoint</th><th>Descripción</th></tr>
+    <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/report/generate</code></td><td>Inicia generación asíncrona del reporte con ReportAgent</td></tr>
+    <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/report/{id}</code></td><td>Obtiene el reporte generado (secciones, metadata)</td></tr>
+    <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/report/{id}/pdf</code></td><td>Descarga el PDF corporativo del reporte</td></tr>
+    <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/report/{id}/chat</code></td><td>Envía mensaje al ReportAgent (chat interactivo)</td></tr>
+    <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/report/by-simulation/{sim_id}</code></td><td>Obtiene reporte asociado a una simulación</td></tr>
+  </table>
+
+  <div class="alert alert-blue">
+    <span class="alert-icon">🔗</span>
+    <div>Todas las respuestas siguen el formato: <code>{"success": true/false, "data": {...}, "error": "..."}</code>. El backend corre en <code>http://localhost:5001</code> y el frontend en <code>http://localhost:3000</code>.</div>
+  </div>
+
+  <div class="page-footer">
+    <span>MinkOracle – Documentación Técnica v0.1</span>
+    <span>github.com/tatanGod17/mirofish</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PAGE 10: COMMANDS -->
+<div class="page">
+  <h2 class="section-title">9. Comandos para Ejecutar el Proyecto</h2>
+
+  <h3>Requisitos Previos</h3>
+  <ul>
+    <li><strong>Python 3.11+</strong> — verificar con <code>python3 --version</code></li>
+    <li><strong>Node.js 18+</strong> — verificar con <code>node --version</code></li>
+    <li><strong>uv</strong> — gestor de paquetes Python: <code>pip install uv</code></li>
+    <li><strong>Archivo <code>backend/.env</code></strong> — con las credenciales configuradas (ver Sección 4)</li>
+  </ul>
+
+  <h3>Instalación (Primera vez)</h3>
+  <div class="cred-box">
+    <div class="cred-box-header">
+      <div class="cred-dot dot-r"></div>
+      <div class="cred-dot dot-y"></div>
+      <div class="cred-dot dot-g"></div>
+      <span>Terminal — Instalación inicial</span>
+    </div>
+    <div class="cred-content">
+<span class="code-comment"># 1. Clonar el repositorio</span>
+git clone https://github.com/tatanGod17/mirofish.git
+cd mirofish
+
+<span class="code-comment"># 2. Instalar dependencias del backend</span>
+cd backend
+uv sync
+cd ..
+
+<span class="code-comment"># 3. Instalar dependencias del frontend</span>
+cd frontend
+npm install
+cd ..
+
+<span class="code-comment"># 4. Crear archivo de credenciales</span>
+cp backend/.env.example backend/.env
+<span class="code-comment"># → Editar backend/.env con tus API keys</span>
+    </div>
+  </div>
+
+  <h3>Ejecución del Proyecto</h3>
+  <div class="cred-box">
+    <div class="cred-box-header">
+      <div class="cred-dot dot-r"></div>
+      <div class="cred-dot dot-y"></div>
+      <div class="cred-dot dot-g"></div>
+      <span>Terminal 1 — Backend Flask (puerto 5001)</span>
+    </div>
+    <div class="cred-content">
+cd backend
+uv run python run.py
+<span class="code-comment"># → http://localhost:5001</span>
+    </div>
+  </div>
+
+  <div class="cred-box">
+    <div class="cred-box-header">
+      <div class="cred-dot dot-r"></div>
+      <div class="cred-dot dot-y"></div>
+      <div class="cred-dot dot-g"></div>
+      <span>Terminal 2 — Frontend Vue (puerto 3000)</span>
+    </div>
+    <div class="cred-content">
+cd frontend
+npm run dev
+<span class="code-comment"># → http://localhost:3000</span>
+    </div>
+  </div>
+
+  <h3>Comandos Útiles</h3>
+  <table>
+    <tr><th>Comando</th><th>Descripción</th></tr>
+    <tr><td><code>lsof -i:5001 | xargs kill -9</code></td><td>Matar proceso en puerto 5001 (backend)</td></tr>
+    <tr><td><code>lsof -i:3000 | xargs kill -9</code></td><td>Matar proceso en puerto 3000 (frontend)</td></tr>
+    <tr><td><code>cd backend && uv add &lt;paquete&gt;</code></td><td>Agregar nueva dependencia Python</td></tr>
+    <tr><td><code>cd frontend && npm install &lt;paquete&gt;</code></td><td>Agregar nueva dependencia npm</td></tr>
+    <tr><td><code>cd backend && uv run python -m pytest</code></td><td>Ejecutar tests del backend</td></tr>
+  </table>
+
+  <div class="alert alert-yellow">
+    <span class="alert-icon">⚠️</span>
+    <div><strong>macOS con chip Intel:</strong> torch tiene restricción de versión <code>≤2.2.2</code> para compatibilidad. En Apple Silicon (M1/M2/M3), no hay restricción de versión.</div>
+  </div>
+
+  <div class="page-footer">
+    <span>MinkOracle – Documentación Técnica v0.1</span>
+    <span>github.com/tatanGod17/mirofish</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PAGE 11: REPO & RESOURCES -->
+<div class="page">
+  <h2 class="section-title">10. Repositorio & Recursos</h2>
+
+  <div class="card card-accent" style="margin-bottom:24px">
+    <div class="card-title">🔗 Repositorio Principal</div>
+    <p style="font-size:11pt;font-family:'JetBrains Mono',monospace;color:#1e3a8a;margin:8px 0;">
+      https://github.com/tatanGod17/mirofish
+    </p>
+    <p style="font-size:9pt;color:#475569;">Repositorio público bajo licencia AGPL-3.0. Incluye backend Flask, frontend Vue 3, locales y documentación.</p>
+  </div>
+
+  <h3>Links de Servicios Externos</h3>
+  <table>
+    <tr>
+      <th>Servicio</th>
+      <th>URL</th>
+      <th>Para qué</th>
+    </tr>
+    <tr>
+      <td><strong>Alibaba Bailian</strong></td>
+      <td><code>bailian.console.aliyun.com</code></td>
+      <td>Obtener LLM_API_KEY (Qwen) — proveedor recomendado</td>
+    </tr>
+    <tr>
+      <td><strong>OpenAI Platform</strong></td>
+      <td><code>platform.openai.com</code></td>
+      <td>Alternativa LLM (GPT-4o, GPT-4o-mini)</td>
+    </tr>
+    <tr>
+      <td><strong>Zep Cloud</strong></td>
+      <td><code>app.getzep.com</code></td>
+      <td>Obtener ZEP_API_KEY — Knowledge Graph</td>
+    </tr>
+    <tr>
+      <td><strong>OASIS Framework</strong></td>
+      <td><code>github.com/camel-ai/oasis</code></td>
+      <td>Documentación del motor de simulación</td>
+    </tr>
+    <tr>
+      <td><strong>CAMEL-AI</strong></td>
+      <td><code>github.com/camel-ai/camel</code></td>
+      <td>Framework multi-agente base</td>
+    </tr>
+  </table>
+
+  <h3>Datos de Archivos Clave</h3>
+  <table>
+    <tr>
+      <th>Archivo</th>
+      <th>Tamaño</th>
+      <th>Descripción</th>
+    </tr>
+    <tr>
+      <td><code>report_agent.py</code></td>
+      <td>~99 KB</td>
+      <td>Componente AI central — ReportAgent con patrón ReACT</td>
+    </tr>
+    <tr>
+      <td><code>simulation_runner.py</code></td>
+      <td>~69 KB</td>
+      <td>Motor de ejecución OASIS con tracking en tiempo real</td>
+    </tr>
+    <tr>
+      <td><code>oasis_profile_generator.py</code></td>
+      <td>~49 KB</td>
+      <td>Generador de perfiles de agentes desde entidades Zep</td>
+    </tr>
+    <tr>
+      <td><code>simulation_config_generator.py</code></td>
+      <td>~39 KB</td>
+      <td>Generador LLM de configuración completa de simulación</td>
+    </tr>
+    <tr>
+      <td><code>Step4Report.vue</code></td>
+      <td>~147 KB</td>
+      <td>Componente frontend más grande — visor y exportador de reportes</td>
+    </tr>
+  </table>
+
+  <div class="divider"></div>
+
+  <div class="two-col">
+    <div class="card card-green">
+      <div class="card-title">✅ Tier Gratuito Soportado</div>
+      <ul style="font-size:9pt;">
+        <li>Zep Cloud free tier para grafos pequeños-medianos</li>
+        <li>Alibaba Qwen free credits para primeras pruebas</li>
+      </ul>
+    </div>
+    <div class="card card-warn">
+      <div class="card-title">💡 Recomendaciones de Uso</div>
+      <ul style="font-size:9pt;">
+        <li>Comenzar con simulaciones de &lt;40 rondas</li>
+        <li>Monitorear consumo de tokens LLM en el dashboard del proveedor</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="margin-top:40px;text-align:center;padding:24px;background:linear-gradient(135deg,#0f172a,#1e3a8a);border-radius:12px;">
+    <p style="color:white;font-size:13pt;font-weight:700;margin-bottom:4px;">MinkOracle v0.1-Preview</p>
+    <p style="color:rgba(255,255,255,0.6);font-size:9pt;">Motor de Inteligencia de Enjambre Conciso y Universal</p>
+    <p style="color:rgba(255,255,255,0.4);font-size:8pt;margin-top:12px;font-family:'JetBrains Mono',monospace;">github.com/tatanGod17/mirofish · Licencia AGPL-3.0</p>
+  </div>
+
+  <div class="page-footer">
+    <span>MinkOracle – Documentación Técnica v0.1</span>
+    <span>Generado: Junio 2026</span>
+  </div>
+</div>
+
+</body>
+</html>

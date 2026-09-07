@@ -1155,7 +1155,12 @@ class ReportAgent:
         if progress_callback:
             progress_callback("planning", 30, t('progress.generatingOutline'))
         
-        system_prompt = f"{PLAN_SYSTEM_PROMPT}\n\n{get_language_instruction()}"
+        lang_inst = get_language_instruction()
+        lang_block = (
+            f"\n\n⚠️ CRITICAL: {lang_inst} "
+            f"Write ALL output in that language only. Translate any non-matching language content."
+        )
+        system_prompt = lang_block + "\n\n" + PLAN_SYSTEM_PROMPT + lang_block
         user_prompt = PLAN_USER_PROMPT_TEMPLATE.format(
             simulation_requirement=self.simulation_requirement,
             total_nodes=context.get('graph_statistics', {}).get('total_nodes', 0),
@@ -1244,6 +1249,13 @@ class ReportAgent:
         if self.report_logger:
             self.report_logger.log_section_start(section.title, section_index)
         
+        lang_instruction = get_language_instruction()
+        lang_warning = (
+            f"\n\n⚠️ CRITICAL LANGUAGE RULE: {lang_instruction} "
+            f"You MUST write the ENTIRE section in that language. "
+            f"ALL tool results must be translated into that language before writing. "
+            f"Do NOT copy Chinese or any other language into the report — translate everything."
+        )
         system_prompt = SECTION_SYSTEM_PROMPT_TEMPLATE.format(
             report_title=outline.title,
             report_summary=outline.summary,
@@ -1251,7 +1263,7 @@ class ReportAgent:
             section_title=section.title,
             tools_description=self._get_tools_description(),
         )
-        system_prompt = f"{system_prompt}\n\n{get_language_instruction()}"
+        system_prompt = lang_warning + "\n\n" + system_prompt + lang_warning
 
         # 构建用户prompt - 每个已完成章节各传入最大4000字
         if previous_sections:
@@ -1446,6 +1458,10 @@ class ReportAgent:
                 if unused_tools and tool_calls_count < self.MAX_TOOL_CALLS_PER_SECTION:
                     unused_hint = REACT_UNUSED_TOOLS_HINT.format(unused_list="、".join(unused_tools))
 
+                lang_reminder = (
+                    f"\n\n⚠️ REMINDER: {get_language_instruction()} "
+                    f"Translate ALL of the above tool result into that language before writing the report."
+                )
                 messages.append({"role": "assistant", "content": response})
                 messages.append({
                     "role": "user",
@@ -1456,7 +1472,7 @@ class ReportAgent:
                         max_tool_calls=self.MAX_TOOL_CALLS_PER_SECTION,
                         used_tools_str=", ".join(used_tools),
                         unused_hint=unused_hint,
-                    ),
+                    ) + lang_reminder,
                 })
                 continue
 
